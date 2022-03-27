@@ -144,24 +144,21 @@ void gen_lab(lab *l) {
             //printf("(%d, %d)\n", elt->i, elt->j);
             l->tab[elt->i][elt->j] = 1;
             list = add_neighbors(l, list, elt->i, elt->j);
+            //print_lab_2(l);
+            //printf("\n");
         }
         list = remove_wall(list, r);
-        //print_lab(l);
-        //printf("\n");
     }
 }
 
 int main(void) {
     srand(time(NULL));
-    lab *l = build_lab(15, 10);
-    gen_lab(l);
-    //print_lab(l);
-    print_lab_2(l);
+    lab *l = build_lab(15,10);
     
     for(int i = 0; i < 10; i++) {
         gen_lab(l);
-        print_lab_2(l);
-        printf("\n");
+        print_lab_2(l);  
+        printf("\n");  
     }
     
     destroy_lab(l);
