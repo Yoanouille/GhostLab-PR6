@@ -132,6 +132,12 @@ list_wall *add_neighbors(lab *l, list_wall *list, int i, int j) {
 }   
 
 void gen_lab(lab *l) {
+    for(int i = 0; i < l->h; i++) {
+        for(int j = 0; j < l->w; j++) {
+            l->tab[i][j] = 0;
+        }
+    }
+
     l->tab[0][0] = 1;
     list_wall *list = add_neighbors(l, NULL, 0, 0);
     
@@ -162,14 +168,4 @@ int main(void) {
     }
     
     destroy_lab(l);
-
-    // list_wall *list = NULL;
-    // list = add_wall(list, 0, 0);
-    // list = add_wall(list, 1, 1);
-    // list = add_wall(list, 7, 7);
-    // list = add_wall(list, 1, 1);
-
-    // print_list_wall(list);
-    // destroy_list_wall(list);
-
 }
