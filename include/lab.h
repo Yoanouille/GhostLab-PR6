@@ -1,6 +1,8 @@
 #ifndef LAB_H
 #define LAB_H
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 typedef struct lab
 {
     int **tab;

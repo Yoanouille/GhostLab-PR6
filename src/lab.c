@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include "lab.h"
 
 typedef struct list_wall list_wall;
