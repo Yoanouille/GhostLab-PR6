@@ -7,6 +7,19 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+
+
+
+
+
+//Peut être changer comment ça marche !
+//D'abord read le GAMES n, puis les n prochains OGAME
+//Puis Ensuite Avec l'interface, il envoie une req (parmis celle dispo par l'interface) 
+//Puis attend la réponse du serveur qui est adapté à la requête envoyé
+//  Chaque reponse reçue (EN TCP) est de taille fixe et puis pas mal de fois où un paquet dit tu vas recevoie n paquet de ce type
+//Donc Faire une fonction pour chaque couple req/res avec les sous reponses qui arrivent
+//Ces fonctions pourront changer les variables globales + actualiser l'interface
+
 public class Client {
     
     private Socket socket;
@@ -19,6 +32,12 @@ public class Client {
             socket = new Socket(addr, port);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void fill(byte[] data, int begin, String s) {
+        for(int i = begin; i < data.length && i < begin + s.length(); i++) {
+            data[i] = (byte) s.charAt(i - begin);
         }
     }
 
@@ -65,36 +84,108 @@ public class Client {
     }
 
     public void traitement(byte[] req, int len) {
-        byte[] debut = new byte[5];
-        for(int i = 0; i < 5; i++) {
-            debut[i] = req[i];
-        }
-        String deb = new String(debut);
+        String deb = new String(req, 0, 5);
         switch(deb) {
             case "GAMES" : 
-                if(len == 7) reqGamesN(req, len);
-                else if(len == 9) reqGamesMS(req, len);
-                else {
-                    print_byte(req, len);
-                    //TODO: error
-                }
+                resGamesN(req, len);
                 break;
+            case "OGAME" :
+                resOGamesMS(req, len);
+                break;
+            
+            case "REGOK" :
+                resRegOK(req, len);
+                break;
+            
+            case "REGNO" :
+                resRegNo(req, len);
+                break;
+            // case "UNROK" :
+            //     resUnRegOK(req, len);
+            //     break;
+            
+            // case "DUNNO" :
+            //     resDunno(req, len);
+            //     break;
+            
+            // case "SIZE!" :
+            //     resSize(req, len);
+            //     break;
+            
+            // case "LIST!" :
+            
         }
     }
 
-    public void reqGamesN(byte[] req, int len) {
+    public void resGamesN(byte[] req, int len) {
+        if(len != 7) {
+            print_byte(req, len);
+            //TODO ERROR;
+            return;
+        }
         count = req[6];
         System.out.println("Il y a " + req[6] + " parties !");
 
     }
 
-    public void reqGamesMS(byte[] req, int len) {
+    public void resOGamesMS(byte[] req, int len) {
+        if(len != 9) {
+            print_byte(req, len);
+            //TODO ERROR;
+            return;
+        }
         System.out.println("Partie " + req[6] + " : " + req[8] + " joueur(s)");
         count--;
         if(count == 0) {
-            //Envoyer un requête
+            //Actualiser l'interface graphique
         }
     }
+
+    public void resRegOK(byte[] req, int len) {
+        System.out.println("Vous avez été inscrit dans la partie " + req[6]);
+        //TODO Actualiser l'interface
+    }
+
+    public void resRegNo(byte[] req, int len) {
+        System.out.println("Impossible de s'inscrire dans la parite voulue");
+    }
+
+    public void reqNewPL(String id, int port) throws IOException {
+        byte[] data = new byte[5 + 1 + 8 + 1 + 4 + 3];
+        fill(data, 0, "NEWPL ");
+        fill(data, 5 + 1, id);
+        fill(data, 5 + 1 + 8, " " + Integer.toString(port));
+        fill(data, 5 + 1 + 8 + 1 + 4, "***");
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+    }
+
+    public void reqRegis(String id, int port, int game) throws IOException {
+        byte[] data = new byte[5 + 1 + 8 + 1 + 4 + 1 + 1 + 3];
+        fill(data, 0, "REGIS ");
+        fill(data, 5 + 1, id);
+        fill(data, 5 + 1 + 8, " " + Integer.toString(port) + " ");
+        data[5 + 1 + 8 + 1 + 4 + 1] = (byte) game;
+        fill(data, 5 + 1 + 8 + 1 + 4 + 1 + 1, "***");
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+    }
+
+    public void reqStart() throws IOException {
+        byte[] data = new byte[5 + 3];
+        fill(data, 0, "START***");
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+    }
+
+    public void reqUnReg() throws IOException {
+        byte[] data = new byte[5 + 3];
+        fill(data, 0, "UNREG***");
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+    }
+
+
 
     public static void main(String[] args) {
         if(args.length != 0) {
