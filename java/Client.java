@@ -1,31 +1,14 @@
 package java;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
-
-
-
-
-
-//Peut être changer comment ça marche !
-//D'abord read le GAMES n, puis les n prochains OGAME
-//Puis Ensuite Avec l'interface, il envoie une req (parmis celle dispo par l'interface) 
-//Puis attend la réponse du serveur qui est adapté à la requête envoyé
-//  Chaque reponse reçue (EN TCP) est de taille fixe et puis pas mal de fois où un paquet dit tu vas recevoie n paquet de ce type
-//Donc Faire une fonction pour chaque couple req/res avec les sous reponses qui arrivent
-//Ces fonctions pourront changer les variables globales + actualiser l'interface
+import java.util.HashMap;
 
 public class Client {
     
     private Socket socket;
-    private boolean running = true;
-
-    private int count = 0;
 
     public Client(InetAddress addr, int port) {
         try {
@@ -35,45 +18,23 @@ public class Client {
         }
     }
 
+    public int myRecv(byte[] data, int offset, int len) throws IOException {
+        int re = 0;
+        do {
+            re = socket.getInputStream().read(data, re + offset, len - re);
+            if(re == -1) break;
+        } while(re < len);
+        return re;
+    }
+
     public void fill(byte[] data, int begin, String s) {
         for(int i = begin; i < data.length && i < begin + s.length(); i++) {
             data[i] = (byte) s.charAt(i - begin);
         }
     }
 
-    public void run() throws IOException {
-        System.out.println("Client Running !");
-
-        InputStream is = socket.getInputStream();
-        
-        byte[] data = new byte[256];
-
-        boolean pre = false;
-        boolean prepre = false;
-
-        byte[] requete = new byte[256];
-        int x = 0;
-
-        while(running) {
-            int re = is.read(data, 0, 256);
-            for(int i = 0; i < re; i++) {
-                if(data[i] == '*') {
-                    if(prepre) {
-                        traitement(requete, x);
-                        x = 0;
-                        prepre = false;
-                        pre = false;
-                    } else if(pre) prepre = true; 
-                    else pre = true;
-                } else {
-                    pre = false;
-                    prepre = false;
-                    requete[x] = data[i];
-                    x++;
-                }
-            }
-        }
-
+    public boolean verifyBegin(byte[] data, int offset, String s) {
+        return new String(data, offset, 5).equals(s);
     }
 
     public void print_byte(byte[] req, int len) {
@@ -83,84 +44,82 @@ public class Client {
         System.out.println();
     }
 
-    public void traitement(byte[] req, int len) {
-        String deb = new String(req, 0, 5);
-        switch(deb) {
-            case "GAMES" : 
-                resGamesN(req, len);
-                break;
-            case "OGAME" :
-                resOGamesMS(req, len);
-                break;
-            
-            case "REGOK" :
-                resRegOK(req, len);
-                break;
-            
-            case "REGNO" :
-                resRegNo(req, len);
-                break;
-            // case "UNROK" :
-            //     resUnRegOK(req, len);
-            //     break;
-            
-            // case "DUNNO" :
-            //     resDunno(req, len);
-            //     break;
-            
-            // case "SIZE!" :
-            //     resSize(req, len);
-            //     break;
-            
-            // case "LIST!" :
-            
+    public HashMap<Integer,Integer> resGames() throws IOException {
+        //GAMES m
+        int len = 10;
+        byte[] data = new byte[len];
+        int re = myRecv(data, 0,len);
+        if(re != len) {
+            System.out.println("Error first msg games");
+            System.exit(1);
         }
-    }
-
-    public void resGamesN(byte[] req, int len) {
-        if(len != 7) {
-            print_byte(req, len);
-            //TODO ERROR;
-            return;
+        
+        if(!verifyBegin(data, 0,"GAMES")) {
+            System.out.println("Wrong msg GAMES ! resGames");
+            System.exit(1);
         }
-        count = req[6];
-        System.out.println("Il y a " + req[6] + " parties !");
+        int m = data[6];
+        System.out.println("Il y a " + m + " parties !");
 
-    }
-
-    public void resOGamesMS(byte[] req, int len) {
-        if(len != 9) {
-            print_byte(req, len);
-            //TODO ERROR;
-            return;
+        len = 12 * m;
+        data = new byte[len];
+        re = myRecv(data, 0,len);
+        if(re != len) {
+            System.out.println("Error msg OGAMES");
+            System.exit(1);
         }
-        System.out.println("Partie " + req[6] + " : " + req[8] + " joueur(s)");
-        count--;
-        if(count == 0) {
-            //Actualiser l'interface graphique
+
+        HashMap<Integer, Integer> res = new HashMap<>();
+
+        for(int i = 0; i < m; i++) {
+            if(!verifyBegin(data, 12 * i,"OGAME")) {
+                System.out.println("Wrong msg OGAME " + i + " ! resGames");
+                System.exit(1);
+            }
+            System.out.println("Partie " + data[12 * i + 6] + " : " + data[12 * i + 8] + " joueur(s)");
+            res.put((int)data[12 * i + 6], (int)data[12 * i + 8]);
         }
+        return res;
     }
 
-    public void resRegOK(byte[] req, int len) {
-        System.out.println("Vous avez été inscrit dans la partie " + req[6]);
-        //TODO Actualiser l'interface
-    }
 
-    public void resRegNo(byte[] req, int len) {
-        System.out.println("Impossible de s'inscrire dans la parite voulue");
-    }
-
-    public void reqNewPL(String id, int port) throws IOException {
+    public boolean reqNewPL(String id, int port) throws IOException {
         byte[] data = new byte[5 + 1 + 8 + 1 + 4 + 3];
-        fill(data, 0, "NEWPL ");
+        fill(data, 0, "NEWPL");
         fill(data, 5 + 1, id);
         fill(data, 5 + 1 + 8, " " + Integer.toString(port));
         fill(data, 5 + 1 + 8 + 1 + 4, "***");
         socket.getOutputStream().write(data);
         socket.getOutputStream().flush();
+
+        return resReg();
     }
 
-    public void reqRegis(String id, int port, int game) throws IOException {
+    public boolean resReg() throws IOException {
+        byte[] data = new byte[10];
+        int len = 5;
+        int re = myRecv(data, 0,len);
+        if(re != len) {
+            System.out.println("Error read resReg !");
+            System.exit(1);
+        }
+        if(verifyBegin(data, 0, "REGOK")) {
+            len = 10;
+            myRecv(data, 5, len - 5);
+            System.out.println("Vous êtes dans la partie " + data[6]);
+            return true;
+        } else if(verifyBegin(data, 0, "REGNO")) {
+            len = 8;
+            myRecv(data, 5, len - 5);
+            return false;
+        } else {
+            System.out.println("Error resReg !"); 
+            System.exit(1);  
+        }
+        return false;
+    }
+
+    public boolean reqRegis(String id, int port, int game) throws IOException {
         byte[] data = new byte[5 + 1 + 8 + 1 + 4 + 1 + 1 + 3];
         fill(data, 0, "REGIS ");
         fill(data, 5 + 1, id);
@@ -169,6 +128,8 @@ public class Client {
         fill(data, 5 + 1 + 8 + 1 + 4 + 1 + 1, "***");
         socket.getOutputStream().write(data);
         socket.getOutputStream().flush();
+
+        return resReg();
     }
 
     public void reqStart() throws IOException {
@@ -178,13 +139,146 @@ public class Client {
         socket.getOutputStream().flush();
     }
 
-    public void reqUnReg() throws IOException {
+    public boolean reqUnReg() throws IOException {
         byte[] data = new byte[5 + 3];
         fill(data, 0, "UNREG***");
         socket.getOutputStream().write(data);
         socket.getOutputStream().flush();
+
+        return resUnReg();
     }
 
+
+    public boolean resUnReg() throws IOException {
+        byte[] data = new byte[10];
+        int len = 5;
+        int re = myRecv(data, 0,len);
+        if(re != len) {
+            System.out.println("Error read resUnReg !");
+            System.exit(1);
+        }
+        if(verifyBegin(data, 0, "UNROK")) {
+            len = 10;
+            myRecv(data, 5, len - 5);
+            System.out.println("Vous vous êtes bien désinscrit de la partie " + data[6]);
+            return true;
+        } else if(verifyBegin(data, 0, "DUNNO")) {
+            len = 8;
+            myRecv(data, 5, len - 5);
+            System.out.println("Peut pas se désinscrire !");
+            return false;
+        } else {
+            System.out.println("Error resUnReg !"); 
+            System.exit(1);  
+        }
+        return false;
+    }
+
+    public int[] reqSize(int m) throws IOException {
+        byte[] data = new byte[10];
+        fill(data, 0, "SIZE? ");
+        data[6] = (byte) m;
+        fill(data, 7, "***");
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+
+        return resSize();
+    }
+
+    public int[] resSize() throws IOException {
+        byte[] data = new byte[10];
+        int len = 5;
+        int re = myRecv(data, 0,len);
+        if(re != len) {
+            System.out.println("Error read resSize !");
+            System.exit(1);
+        }
+        if(verifyBegin(data, 0, "SIZE!")) {
+            len = 16;
+            myRecv(data, 5, len - 5);
+            int[] res = new int[2];
+
+            //TODO: va Falloir les convertir !!!! (en little endian ou big endian)
+            res[0] = ((data[8] & 0xff) << 8) | (data[9] & 0xff);
+            res[1] = ((data[11] & 0xff) << 8) | (data[12] & 0xff);
+            System.out.println("Taille labyrinthe  partie " + data[6] + " : " + res[0] + "x" + res[1]);
+            return res;
+        } else if(verifyBegin(data, 0, "DUNNO")) {
+            len = 8;
+            myRecv(data, 5, len - 5);
+            System.out.println("Pas de partie correspondante");
+            return null;
+        } else {
+            System.out.println("Error resSize !"); 
+            System.exit(1);  
+        }
+        return null;
+    }
+
+    public String[] reqList(int m) throws IOException {
+        byte[] data = new byte[10];
+        fill(data, 0, "LIST? ");
+        data[6] = (byte) m;
+        fill(data, 7, "***");
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+
+        return resList();
+    }
+
+    public String[] resList() throws IOException {
+        int len = 10;
+        byte[] data = new byte[len];
+        int re = myRecv(data, 0, 5);
+        if(re != 5) {
+            System.out.println("Error resList first recv");
+            System.exit(1);
+        }
+        if(verifyBegin(data, 0, "DUNNO")) {
+            len = 8;
+            myRecv(data, 5, 8 - 5);
+            System.out.println("Pas de partie correspondante");
+        } else if(!verifyBegin(data, 0, "LIST!")) {
+            System.out.println("Wrong msg ! resList");
+            System.exit(1);
+        }
+
+        myRecv(data, 5, len - 5);
+        int m = (int) data[6];
+        System.out.println("Pour la partie " + m + ", il y a :" );
+        int s = (int) data[8];
+
+        len = s * 17;
+        data = new byte[len];
+        
+        String[] res = new String[s];
+        for(int i = 0; i < s; i++) {
+            if(!verifyBegin(data, 17 * i,"PLAYR")) {
+                System.out.println("Wrong msg PLAYR " + i + " ! resList");
+                System.exit(1);
+            }
+            String joueur = new String(data, 12 * i + 6, 8);
+            System.out.println("\tJoueur " + i + " : " + joueur);
+            res[i] = joueur;
+        }
+        return res;
+    }
+
+    public HashMap<Integer, Integer> reqGame() throws IOException {
+        byte[] data = "GAME?***".getBytes();
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+
+        return resGames();
+    }
+
+    public void sendStart() throws IOException {
+        byte[] data = "START***".getBytes();
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+
+        //TODO: Recevoir le Welcome !
+    }
 
 
     public static void main(String[] args) {
@@ -197,7 +291,7 @@ public class Client {
 
         try {
             Client c = new Client(InetAddress.getByName(addr), port);
-            c.run();
+            //c.run();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
