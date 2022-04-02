@@ -9,7 +9,3 @@ player *genPlayer(){
     }
     return p;
 }
-
-int main(){
-    return 0;
-}
