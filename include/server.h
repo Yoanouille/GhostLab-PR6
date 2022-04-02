@@ -10,6 +10,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "game.h"
+
 
 int traitement (int sock,char* mess,int* running);
 void  *communication(void *arg);
