@@ -19,12 +19,13 @@ public class Client {
     }
 
     public int myRecv(byte[] data, int offset, int len) throws IOException {
-        int re = 0;
+        int size_recv = 0;
         do {
-            re = socket.getInputStream().read(data, re + offset, len - re);
+            int re = socket.getInputStream().read(data, size_recv + offset, len - size_recv);
             if(re == -1) break;
-        } while(re < len);
-        return re;
+            size_recv += re;
+        } while(size_recv < len);
+        return size_recv;
     }
 
     public void fill(byte[] data, int begin, String s) {
@@ -84,11 +85,12 @@ public class Client {
 
 
     public boolean reqNewPL(String id, int port) throws IOException {
-        byte[] data = new byte[5 + 1 + 8 + 1 + 4 + 3];
-        fill(data, 0, "NEWPL");
-        fill(data, 5 + 1, id);
-        fill(data, 5 + 1 + 8, " " + Integer.toString(port));
-        fill(data, 5 + 1 + 8 + 1 + 4, "***");
+        // byte[] data = new byte[5 + 1 + 8 + 1 + 4 + 3];
+        // fill(data, 0, "NEWPL ");
+        // fill(data, 5 + 1, id);
+        // fill(data, 5 + 1 + 8, " " + Integer.toString(port));
+        // fill(data, 5 + 1 + 8 + 1 + 4, "***");
+        byte[] data = ("NEWPL "+id+" "+Integer.toString(port)+"***").getBytes();
         socket.getOutputStream().write(data);
         socket.getOutputStream().flush();
 
