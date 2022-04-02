@@ -1,5 +1,3 @@
-package java;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -82,7 +80,6 @@ public class Client {
         }
         return res;
     }
-
 
     public boolean reqNewPL(String id, int port) throws IOException {
         // byte[] data = new byte[5 + 1 + 8 + 1 + 4 + 3];
@@ -284,7 +281,7 @@ public class Client {
 
 
     public static void main(String[] args) {
-        if(args.length != 0) {
+        if(args.length != 2) {
             System.out.println("IP + PORT STP !!!!");
             System.exit(0);
         }
@@ -293,10 +290,9 @@ public class Client {
 
         try {
             Client c = new Client(InetAddress.getByName(addr), port);
+            Fenetre f = new Fenetre(c);
             //c.run();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
 
