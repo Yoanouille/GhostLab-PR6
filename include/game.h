@@ -23,7 +23,7 @@ typedef struct game_list {
 game *gen_game(int w, int h);
 void free_game(game *g);
 
-void add_player_game(game *g,  int sock, struct sockaddr_in addr, int port_udp,int x, int y, char *id);
+void add_player_game(game *g,  int sock, struct sockaddr_in addr, int x, int y, char *id);
 void remove_player_game(game *g, int sock);
 
 game_list *add_game(game_list *l, game *g);

@@ -23,8 +23,8 @@ void free_game(game *g) {
     free(g);
 }
 
-void add_player_game(game *g,  int sock, struct sockaddr_in addr, int port_udp,int x, int y, char *id) {
-    g->players = add_player(g->players, sock, addr, port_udp, x, y, id);
+void add_player_game(game *g,  int sock, struct sockaddr_in addr, int x, int y, char *id) {
+    g->players = add_player(g->players, sock, addr, x, y, id);
 }
 
 void remove_player_game(game *g, int sock) {

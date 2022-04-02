@@ -2,7 +2,7 @@
 
 
 
-player *genPlayer(int sock, struct sockaddr_in addr, int port_udp, int x, int y, char *id){
+player *genPlayer(int sock, struct sockaddr_in addr, int x, int y, char *id){
     player  *p = malloc(sizeof(player));
     if(p == NULL){
         perror("malloc genPlayer");
@@ -10,7 +10,6 @@ player *genPlayer(int sock, struct sockaddr_in addr, int port_udp, int x, int y,
     }
     p->sock = sock;
     p->addr = addr;
-    p->port_udp = port_udp;
     p->x = x;
     p->y = y;
     p->score = 0;
@@ -21,18 +20,18 @@ player *genPlayer(int sock, struct sockaddr_in addr, int port_udp, int x, int y,
     return p;
 }
 
-player_list *add_player(player_list *list, int sock, struct sockaddr_in addr, int port_udp,int x, int y, char *id) {
+player_list *add_player(player_list *list, int sock, struct sockaddr_in addr, int x, int y, char *id) {
     if(list == NULL) {
         player_list *l = malloc(sizeof(player_list));
         if(l == NULL) {
             perror("malloc player add_player");
             exit(EXIT_FAILURE);
         }
-        l->p = genPlayer(sock, addr, port_udp, x, y, id);
+        l->p = genPlayer(sock, addr, x, y, id);
         l->next = NULL;
         return l;
     }
-    list->next = add_player(list->next, sock, addr, port_udp, x, y, id);
+    list->next = add_player(list->next, sock, addr, x, y, id);
     return list;
 }
 
