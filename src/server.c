@@ -2,10 +2,58 @@
 
 #define SIZE 8
 
-int traitement (char* mess,int* running){
 
 
-    return EXIT_SUCCESS;
+int NUMBER_GAMES = 0;
+
+
+
+int mySend(int sock,char* message,int size){
+    int size_send = 0;
+    do{
+        int r = send(sock,message + size_send, size - size_send,0);
+        if(r == -1){
+            perror("send");
+            return -1;
+        }
+        if(r == 0) {
+            return 0;
+        }
+
+    }while(size_send < size);
+    
+}
+
+
+//Function used on one message
+
+int traitement (int sock,char* mess,int* running){
+    if(strncmp(mess,"NEWPL",5) == 0){
+        //Create a game
+        return EXIT_SUCCESS;
+    } else if (strncmp(mess,"REGIS",5) == 0){
+        //Register the player
+        return EXIT_SUCCESS;
+    }else if (strncmp(mess,"UNREG",5) == 0){
+        //Unregister the player
+        return EXIT_SUCCESS;
+    }else if (strncmp(mess,"SIZE",5) == 0){
+        //Send size of the maze
+        return EXIT_SUCCESS;
+    }else if (strncmp(mess,"LIST",5) == 0){
+        //List of other players
+        return EXIT_SUCCESS;
+    }else if (strncmp(mess,"GAME",5) == 0){
+        //List of still not launched games
+        return EXIT_SUCCESS;
+    }else if (strncmp(mess,"START",5) == 0){
+        //Start the game if all players sent start
+        return EXIT_SUCCESS;
+    }else {
+        char message [] = "GOBYE***";
+        mySend(sock,message,8);
+        return EXIT_FAILURE;
+    }
 }
 
 
@@ -13,12 +61,22 @@ int traitement (char* mess,int* running){
 /* Here the TCP connection is established
 You treat the communication protocol between server and ONE client
 */
-void  *communication(void *arg){
+void *communication(void *arg){
     int sock = *(int *) (arg);
+    //First message send is the number of games
+    char message[10];
+    memcpy(message,"GAMES n***",10);
+    message[6] = NUMBER_GAMES;
+    mySend(sock,message,sizeof(message));
 
-      char buff[SIZE + 1];
+    for(int i = 0; i < NUMBER_GAMES; i++){
+        //TODO send the [OGAME_m_s***] messages
+    }
+    //Buffer where we receive data
+    char buff[SIZE + 1];
     memset(buff, 0, SIZE + 1);
 
+    //Futur full message
     char mess[200];
     memset(buff, 0, 200);
     int x = 0;
@@ -38,8 +96,10 @@ void  *communication(void *arg){
             if(buff[i] == '*') {
                 
                 if(prepre) {
-                    
-                    printf("%s\n", mess);
+                    if(traitement(sock,mess,&running) != EXIT_SUCCESS){
+                        running = 0;
+                        break;
+                    }
                     memset(mess, 0, 200);
                     x = 0;
                 } 
@@ -54,9 +114,8 @@ void  *communication(void *arg){
         }
         if(re == -1) {
             perror("read");
-            return 1;
+            return NULL ;
         }
-        if(re < SIZE) break;
     }
 
     close(sock);
@@ -104,9 +163,9 @@ int main(int argc, char const *argv[]){
             perror("accept");
             return EXIT_FAILURE;
         }
-        pthread_t th;
 
-        
+        //One thread per client
+        pthread_t th;
         if(pthread_create(&th,NULL,communication,sock_client) != 0){
             perror("Thread_create");
             return EXIT_FAILURE;

@@ -8,9 +8,10 @@
 #include <string.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <string.h>
 
 
-int traitement (char* mess,int* running);
+int traitement (int sock,char* mess,int* running);
 void  *communication(void *arg);
 int main(int argc, char const *argv[]);
 
