@@ -21,7 +21,7 @@ int mySend(int sock,char* message,int size){
         }
 
     }while(size_send < size);
-    
+    return size_send;
 }
 
 

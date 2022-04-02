@@ -1,6 +1,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 #include <netinet/in.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 
 typedef struct player{
     int x;
