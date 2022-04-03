@@ -28,6 +28,24 @@ public class Client {
         return size_recv;
     }
 
+    public int myRecvDelimiter(byte[] data, int maxLen) throws IOException {
+        int len = 0;
+        do {
+            int re = socket.getInputStream().read(data, len, maxLen - len);
+            if(re == -1) {
+                System.out.println("Error myRecv2");
+                System.exit(1);
+            }
+            len += re;
+            if(len >= 3 && data[len -1] == '*' && data[len - 2] == '*' && data[len - 3] == '*') {
+
+                return len;
+            }
+
+        } while(len < maxLen);
+        return len;
+    }
+
     public void fill(byte[] data, int begin, String s) {
         for(int i = begin; i < data.length && i < begin + s.length(); i++) {
             data[i] = (byte) s.charAt(i - begin);
@@ -84,11 +102,6 @@ public class Client {
     }
 
     public boolean reqNewPL(String id, int port) throws IOException {
-        // byte[] data = new byte[5 + 1 + 8 + 1 + 4 + 3];
-        // fill(data, 0, "NEWPL ");
-        // fill(data, 5 + 1, id);
-        // fill(data, 5 + 1 + 8, " " + Integer.toString(port));
-        // fill(data, 5 + 1 + 8 + 1 + 4, "***");
         byte[] data = ("NEWPL "+id+" "+Integer.toString(port)+"***").getBytes();
         socket.getOutputStream().write(data);
         socket.getOutputStream().flush();
@@ -98,20 +111,17 @@ public class Client {
 
     public boolean resReg() throws IOException {
         byte[] data = new byte[10];
-        int len = 5;
-        int re = myRecv(data, 0,len);
-        if(re != len) {
+        int len = 10;
+        int re = myRecvDelimiter(data,len);
+        if(re != 10 || re != 8) {
             System.out.println("Error read resReg !");
             System.exit(1);
         }
         if(verifyBegin(data, 0, "REGOK")) {
-            len = 10;
-            myRecv(data, 5, len - 5);
             System.out.println("Vous êtes dans la partie " + data[6]);
             return true;
         } else if(verifyBegin(data, 0, "REGNO")) {
-            len = 8;
-            myRecv(data, 5, len - 5);
+            System.out.println("Impossible !");
             return false;
         } else {
             System.out.println("Error resReg !"); 
@@ -152,20 +162,16 @@ public class Client {
 
     public boolean resUnReg() throws IOException {
         byte[] data = new byte[10];
-        int len = 5;
-        int re = myRecv(data, 0,len);
-        if(re != len) {
+        int len = 10;
+        int re = myRecvDelimiter(data, len);
+        if(re != 10 || re != 8) {
             System.out.println("Error read resUnReg !");
             System.exit(1);
         }
         if(verifyBegin(data, 0, "UNROK")) {
-            len = 10;
-            myRecv(data, 5, len - 5);
             System.out.println("Vous vous êtes bien désinscrit de la partie " + data[6]);
             return true;
         } else if(verifyBegin(data, 0, "DUNNO")) {
-            len = 8;
-            myRecv(data, 5, len - 5);
             System.out.println("Peut pas se désinscrire !");
             return false;
         } else {
@@ -187,16 +193,14 @@ public class Client {
     }
 
     public int[] resSize() throws IOException {
-        byte[] data = new byte[10];
-        int len = 5;
-        int re = myRecv(data, 0,len);
-        if(re != len) {
+        byte[] data = new byte[16];
+        int len = 16;
+        int re = myRecvDelimiter(data,len);
+        if(re != 16 || re != 8) {
             System.out.println("Error read resSize !");
             System.exit(1);
         }
         if(verifyBegin(data, 0, "SIZE!")) {
-            len = 16;
-            myRecv(data, 5, len - 5);
             int[] res = new int[2];
 
             //TODO: va Falloir les convertir !!!! (en little endian ou big endian)
@@ -205,8 +209,6 @@ public class Client {
             System.out.println("Taille labyrinthe  partie " + data[6] + " : " + res[0] + "x" + res[1]);
             return res;
         } else if(verifyBegin(data, 0, "DUNNO")) {
-            len = 8;
-            myRecv(data, 5, len - 5);
             System.out.println("Pas de partie correspondante");
             return null;
         } else {
@@ -230,21 +232,18 @@ public class Client {
     public String[] resList() throws IOException {
         int len = 10;
         byte[] data = new byte[len];
-        int re = myRecv(data, 0, 5);
-        if(re != 5) {
+        int re = myRecvDelimiter(data, len);
+        if(re != 10 || re != 8) {
             System.out.println("Error resList first recv");
             System.exit(1);
         }
         if(verifyBegin(data, 0, "DUNNO")) {
-            len = 8;
-            myRecv(data, 5, 8 - 5);
             System.out.println("Pas de partie correspondante");
         } else if(!verifyBegin(data, 0, "LIST!")) {
             System.out.println("Wrong msg ! resList");
             System.exit(1);
         }
 
-        myRecv(data, 5, len - 5);
         int m = (int) data[6];
         System.out.println("Pour la partie " + m + ", il y a :" );
         int s = (int) data[8];
