@@ -11,9 +11,6 @@
 #include <string.h>
 
 #include "game.h"
+#include "player.h"
 
-
-int traitement (int sock,char* mess,int* running);
-void  *communication(void *arg);
-int main(int argc, char const *argv[]);
 

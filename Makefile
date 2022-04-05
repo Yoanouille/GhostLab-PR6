@@ -5,7 +5,7 @@ TARGETS= server Main.class
 all: ${TARGETS}
 
 server: server.o player.o lab.o game.o
-	${CC} -o server server.o player.o lab.o
+	${CC} -o server -pthread  server.o player.o lab.o game.o
 
 server.o: src/server.c include/server.h include/player.h include/lab.h include/game.h
 	${CC} ${LDFLAGS} -c src/server.c
