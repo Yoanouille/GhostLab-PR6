@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "game.h"
+
+typedef struct game game;
 
 typedef struct player{
     int sock;
@@ -14,6 +17,7 @@ typedef struct player{
     int score;
     char id[9];
     int bool_start_send;
+    game *his_game;
 } player;
 
 typedef struct player_list player_list;

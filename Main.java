@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -14,9 +15,13 @@ public class Main {
 
         try {
             Client c = new Client(InetAddress.getByName(addr), port);
-            Fenetre f = new Fenetre(c);
-            //c.run();
+            //Fenetre f = new Fenetre(c);
+            c.resGames();
+            c.reqNewPL("JEANCLAU", 7777);
+            c.reqGame();
         } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

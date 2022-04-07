@@ -14,6 +14,7 @@ player *genPlayer(int sock, struct sockaddr_in addr, int x, int y, char *id){
     p->y = y;
     p->score = 0;
     p->bool_start_send = 0;
+    p->his_game = NULL;
     
     memset(p->id, 0, 9);
     strncpy(p->id, id, 8);

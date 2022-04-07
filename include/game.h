@@ -3,6 +3,9 @@
 #include "player.h"
 #include "lab.h"
 
+typedef struct player_list player_list;
+typedef struct player player;
+
 typedef struct game {
     int id;
     int num_player;
@@ -19,7 +22,6 @@ struct game_list{
     game *g;
 };
 
-
 game *gen_game(int w, int h);
 void free_game(game *g);
 
@@ -32,7 +34,7 @@ game_list *add_game(game_list *l, game *g);
 game_list *remove_game(game_list *l, int id_game);
 void destroy_game_list(game_list *l);
 game *get_game(game_list *l, int id);
-game *get_player_game(game_list *l,player *p);
+//game *get_player_game(game_list *l,player *p);
 int size_list_game(game_list *l);
 
 #endif

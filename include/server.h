@@ -9,8 +9,13 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <string.h>
+#include <endian.h>
 
 #include "game.h"
 #include "player.h"
+#include "comm.h"
 
+#define SIZE 8
+#define HEIGHT 20
+#define WIDTH 20
 

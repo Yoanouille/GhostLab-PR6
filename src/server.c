@@ -1,125 +1,50 @@
 #include "server.h"
 
-#define SIZE 8
-#define HEIGHT 20
-#define WIDTH 20
-
 game_list* g_list;
 
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 
-
-int mySend(int sock,char* message,int size){
-    int size_send = 0;
-    do{
-        int r = send(sock,message + size_send, size - size_send,0);
-        if(r == -1){
-            perror("send");
-            return -1;
-        }
-        if(r == 0) {
-            return 0;
-        }
-
-    }while(size_send < size);
-    return size_send;
-}
-
 //Function used on one message
 
 int traitement (player *p,char* mess,int* running){
+    printf("%s\n", mess);
     if(strncmp(mess,"NEWPL",5) == 0){
-        memcpy(p->id, mess+6,8);
-        p->id[8] = '\0';
-        game *g = gen_game(WIDTH,HEIGHT);
-        add_player_game(g,p);
         pthread_mutex_lock(&lock);
-        g_list = add_game(g_list,g);
-        if(g->id == 255 || p->bool_start_send){
-            g_list = remove_game(g_list,255);
-            char no[] = "REGNO***";
-            mySend(p->sock,no,8);
-            pthread_mutex_unlock(&lock);
-            return EXIT_FAILURE;
-        }
+        int r = req_newPl(p, mess, &g_list);
         pthread_mutex_unlock(&lock);
-        
-        char port[4];
-        memcpy(port,mess+15,4);
-        p->addr.sin_port = htons(atoi(port));
-        char ok[] = "REGOK m***";
-        ok[6] = g->id;
-        mySend(p->sock,ok,8);
-        return EXIT_SUCCESS;
+        return r;
 
     } else if (strncmp(mess,"REGIS",5) == 0){
         //Register the player
-        char id[8];
-        memcpy(id, mess+6,8);
-        char m = mess[20];
+        pthread_mutex_lock(&lock);
+        int r = req_Regis(p, mess, g_list);
         pthread_mutex_unlock(&lock);
-        game *g = get_game(g_list,m);
-        if(get_player(g->players,id) != NULL || p->bool_start_send || g->bool_started){
-            char no[] = "REGNO***";
-            mySend(p->sock,no,8);
-            pthread_mutex_unlock(&lock);
-            return EXIT_FAILURE;
-        }
-        
-        
-        add_player_game(g,p);
-        pthread_mutex_unlock(&lock);
-
-        char port[4];
-        memcpy(port,mess+15,4);
-        p->addr.sin_port = htons(atoi(port));
-
-        char ok[] = "REGOK m***";
-        ok[6] = g->id;
-        mySend(p->sock,ok,8);
-        return EXIT_SUCCESS;
-
+        return r;
 
     }else if (strncmp(mess,"UNREG",5) == 0){
         //Unregister the player
         pthread_mutex_lock(&lock);
-        game *g = get_player_game(g_list,p);
-        if(g == NULL || p->bool_start_send || g->bool_started){
-            char dunno[] = "DUNNO***";
-            mySend(p->sock,dunno,8);
-            pthread_mutex_unlock(&lock);
-            return EXIT_FAILURE;
-        }
-
-        remove_player_game(g,p->sock);
+        int r = req_unReg(p, &g_list);
         pthread_mutex_unlock(&lock);
-        char ok[] = "UNROK m***";
-        ok[6] = g->id;
-        mySend(p->sock,ok,10);
-        return EXIT_SUCCESS;
-    }else if (strncmp(mess,"SIZE!",5) == 0){
+        return r;
+    }else if (strncmp(mess,"SIZE?",5) == 0){
         //Send size of the maze
-        int m = mess[6];
-
         pthread_mutex_lock(&lock);
-        game *g = get_game(g_list,m);
-        if(g == NULL || p->bool_start_send){
-            char dunno[] = "DUNNO***";
-            mySend(p->sock,dunno,8);
-            pthread_mutex_unlock(&lock);
-            return EXIT_FAILURE;
-        }
-        char size[] = "SIZE! m hh ww***";
-        size[6] = m;
-
-
-        return EXIT_SUCCESS;
-    }else if (strncmp(mess,"LIST",5) == 0){
-        //List of other players
-        return EXIT_SUCCESS;
-    }else if (strncmp(mess,"GAME",5) == 0){
+        int r = req_Size(p, mess, g_list);
+        pthread_mutex_unlock(&lock);
+        return r;
+    }else if (strncmp(mess,"LIST?",5) == 0){
+        pthread_mutex_lock(&lock);
+        int r = req_List(p, mess, g_list);
+        pthread_mutex_unlock(&lock);
+        return r;
+    }else if (strncmp(mess,"GAME?",5) == 0){
         //List of still not launched games
+        pthread_mutex_lock(&lock);
+        send_game(p->sock, g_list);
+        send_ogame(p->sock, g_list);
+        pthread_mutex_unlock(&lock);
         return EXIT_SUCCESS;
     }else if (strncmp(mess,"START",5) == 0){
         //Start the game if all players sent start
@@ -132,16 +57,6 @@ int traitement (player *p,char* mess,int* running){
 }
 
 
-void send_ogame(game_list *l, int sock) {
-    if(l == NULL) return;
-    char *mess = "OGAME m s***";
-    mess[6] = l->g->id;
-    mess[8] = l->g->num_player;
-    mySend(sock, mess, 12);
-    send_ogame(l->next, sock);
-}
-
-
 /* Here the TCP connection is established
 You treat the communication protocol between server and ONE client
 */
@@ -150,11 +65,11 @@ void *communication(void *arg){
     //First message send is the number of games
     char message[10];
     memcpy(message,"GAMES n***",10);
+    
     pthread_mutex_lock(&lock);
-    uint8_t nb_game = size_list_game(g_list);
-    message[6] = nb_game;
-    mySend(p->sock,message,sizeof(message));
-    send_ogame(g_list, p->sock);
+   
+    send_game(p->sock, g_list);
+    send_ogame(p->sock, g_list);
     pthread_mutex_unlock(&lock);
     
     //Buffer where we receive data
@@ -172,10 +87,10 @@ void *communication(void *arg){
         int re = recv(p->sock, buff, SIZE,0);
         if(re ==-1){
             perror("recv");
-            exit(EXIT_FAILURE);
+            break;
         }else if(re == 0){
             dprintf(2,"Client closed connection");
-            exit(EXIT_FAILURE);
+            break;
         }
         for(int i = 0; i < re; i++) {
             if(buff[i] == '*') {
@@ -203,6 +118,9 @@ void *communication(void *arg){
         }
     }
 
+    if(p->his_game != NULL) {
+        remove_player_game(p->his_game, p->sock);
+    }
     close(p->sock);
     free(arg);
     return NULL;

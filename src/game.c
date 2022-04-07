@@ -75,7 +75,7 @@ game_list *remove_game(game_list *l, int id_game) {
     if(l == NULL) return NULL;
     if(l->g->id == id_game) {
         game_list *n = l->next;
-        free(l->g);
+        free_game(l->g);
         free(l);
         return n;
     }
@@ -97,11 +97,11 @@ game *get_game(game_list *l, int id) {
     return get_game(l->next, id);
 }
 
-game *get_player_game(game_list *l,player *p){
-    if(l==NULL) return NULL;
-    if(get_player_from_sock(l->g->players,p->sock) != NULL) return l->g;
-    return get_player_game(l->next,p);
-}
+// game *get_player_game(game_list *l,player *p){
+//     if(l==NULL) return NULL;
+//     if(get_player_from_sock(l->g->players,p->sock) != NULL) return l->g;
+//     return get_player_game(l->next,p);
+// }
 
 int size_list_game(game_list *l) {
     if(l == NULL) return 0;
