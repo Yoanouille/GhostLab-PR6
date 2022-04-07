@@ -102,3 +102,8 @@ game *get_player_game(game_list *l,player *p){
     if(get_player_from_sock(l->g->players,p->sock) != NULL) return l->g;
     return get_player_game(l->next,p);
 }
+
+int size_list_game(game_list *l) {
+    if(l == NULL) return 0;
+    else return 1 + size_list_game(l->next);
+}

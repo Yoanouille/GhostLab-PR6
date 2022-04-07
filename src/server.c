@@ -6,8 +6,6 @@
 
 game_list* g_list;
 
-int NUMBER_GAMES = 0;
-
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 
@@ -32,8 +30,8 @@ int mySend(int sock,char* message,int size){
 
 int traitement (player *p,char* mess,int* running){
     if(strncmp(mess,"NEWPL",5) == 0){
-        char id[8];
-        memcpy(id, mess+6,8);
+        memcpy(p->id, mess+6,8);
+        p->id[8] = '\0';
         game *g = gen_game(WIDTH,HEIGHT);
         add_player_game(g,p);
         pthread_mutex_lock(&lock);
@@ -115,6 +113,7 @@ int traitement (player *p,char* mess,int* running){
         char size[] = "SIZE! m hh ww***";
         size[6] = m;
 
+
         return EXIT_SUCCESS;
     }else if (strncmp(mess,"LIST",5) == 0){
         //List of other players
@@ -133,6 +132,15 @@ int traitement (player *p,char* mess,int* running){
 }
 
 
+void send_ogame(game_list *l, int sock) {
+    if(l == NULL) return;
+    char *mess = "OGAME m s***";
+    mess[6] = l->g->id;
+    mess[8] = l->g->num_player;
+    mySend(sock, mess, 12);
+    send_ogame(l->next, sock);
+}
+
 
 /* Here the TCP connection is established
 You treat the communication protocol between server and ONE client
@@ -142,12 +150,13 @@ void *communication(void *arg){
     //First message send is the number of games
     char message[10];
     memcpy(message,"GAMES n***",10);
-    message[6] = NUMBER_GAMES;
+    pthread_mutex_lock(&lock);
+    uint8_t nb_game = size_list_game(g_list);
+    message[6] = nb_game;
     mySend(p->sock,message,sizeof(message));
-
-    for(int i = 0; i < NUMBER_GAMES; i++){
-        //TODO send the [OGAME_m_s***] messages
-    }
+    send_ogame(g_list, p->sock);
+    pthread_mutex_unlock(&lock);
+    
     //Buffer where we receive data
     char buff[SIZE + 1];
     memset(buff, 0, SIZE + 1);

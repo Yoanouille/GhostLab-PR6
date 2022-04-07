@@ -9,7 +9,6 @@ typedef struct game {
     player_list *players;
     lab *lab;
     int bool_started;
-    //peut être un port pour l'udp
     //et les fantomes
     //peut être le nombre de joueurs ? mais on peut l'avoir avec players
 } game;
@@ -34,6 +33,6 @@ game_list *remove_game(game_list *l, int id_game);
 void destroy_game_list(game_list *l);
 game *get_game(game_list *l, int id);
 game *get_player_game(game_list *l,player *p);
-
+int size_list_game(game_list *l);
 
 #endif
