@@ -85,11 +85,12 @@ void *communication(void *arg){
     int running = 1;
     while(running) {
         int re = recv(p->sock, buff, SIZE,0);
+        //printf("%d\n", re);
         if(re ==-1){
             perror("recv");
             break;
         }else if(re == 0){
-            dprintf(2,"Client closed connection");
+            dprintf(2,"Client closed connection\n");
             break;
         }
         for(int i = 0; i < re; i++) {
@@ -117,6 +118,8 @@ void *communication(void *arg){
             return NULL ;
         }
     }
+
+    printf("FIN THREAD\n");
 
     if(p->his_game != NULL) {
         remove_player_game(p->his_game, p->sock);

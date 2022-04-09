@@ -22,7 +22,7 @@ game.o: src/game.c include/game.h include/lab.h include/player.h
 comm.o: src/comm.c include/comm.h include/player.h include/server.h include/game.h
 	${CC} ${LDFLAGS} -c src/comm.c
 
-Main.class: Main.java srcjava/Client.java srcjava/Fenetre.java srcjava/Accueil.java
+Main.class: Main.java srcjava/Client.java srcjava/Fenetre.java srcjava/Accueil.java srcjava/ClientV2.java
 	javac Main.java
 
 clean: 

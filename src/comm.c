@@ -49,7 +49,7 @@ int req_newPl(player *p, char *mess, game_list **l) {
         p->his_game = NULL;
         char no[] = "REGNO***";
         mySend(p->sock,no,8);
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
     
     char port[5];
@@ -70,7 +70,7 @@ int req_Regis(player *p, char *mess, game_list *l) {
     if(get_player(g->players,p->id) != NULL || p->bool_start_send || g->bool_started){
         char no[] = "REGNO***";
         mySend(p->sock,no,8);
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
     
     
@@ -93,7 +93,7 @@ int req_unReg(player *p, game_list **l) {
     if(g == NULL || p->bool_start_send || g->bool_started){
         char dunno[] = "DUNNO***";
         mySend(p->sock,dunno,8);
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
 
     remove_player_game(g,p->sock);
@@ -111,7 +111,7 @@ int req_Size(player *p, char *mess, game_list *l) {
     if(g == NULL || p->bool_start_send){
         char dunno[] = "DUNNO***";
         mySend(p->sock,dunno,8);
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
     char res[] = "SIZE! m hh ww***";
     res[6] = m;
@@ -129,7 +129,7 @@ int req_List(player *p, char *mess, game_list *l) {
     if(g == NULL || p->bool_start_send){
         char dunno[] = "DUNNO***";
         mySend(p->sock,dunno,8);
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
 
     char res[] = "LIST! m s***";
