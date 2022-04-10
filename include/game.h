@@ -12,8 +12,9 @@ typedef struct game {
     player_list *players;
     lab *lab;
     int bool_started;
+    int fd; //Faudra pas Oublier de le close !!!!!!
     //et les fantomes
-    //peut être le nombre de joueurs ? mais on peut l'avoir avec players
+    
 } game;
 
 typedef struct game_list game_list;
@@ -29,6 +30,7 @@ void add_player_game_gen(game *g,  int sock, struct sockaddr_in addr, int x, int
 void add_player_game(game *g, player *p);
 
 void remove_player_game(game *g, int sock);
+int all_started(player_list *pl);
 
 game_list *add_game(game_list *l, game *g);
 game_list *remove_game(game_list *l, int id_game);

@@ -48,6 +48,27 @@ int traitement (player *p,char* mess,int* running){
         return EXIT_SUCCESS;
     }else if (strncmp(mess,"START",5) == 0){
         //Start the game if all players sent start
+        pthread_mutex_lock(&lock);
+        p->bool_start_send = 1;
+        if(p->his_game != NULL) {
+            if(all_started(p->his_game->players)) {
+                uint64_t c = 1;
+                if(write(p->his_game->fd, &c, sizeof(u_int64_t)) < sizeof(uint64_t)) {
+                    perror("write/notify");
+                    exit(EXIT_FAILURE);
+                }
+                //Lancer un Thread pour la game !
+                pthread_mutex_unlock(&lock);
+            } else {  
+                pthread_mutex_unlock(&lock);  
+                fd_set read_fd;
+                FD_ZERO(&read_fd);
+                FD_SET(p->his_game->fd, &read_fd);
+                
+                select(p->his_game->fd + 1, &read_fd, NULL, NULL, NULL);
+            }
+            //SEND WELCOME
+        } else pthread_mutex_unlock(&lock);
         return EXIT_SUCCESS;
     }else {
         char message [] = "GOBYE***";

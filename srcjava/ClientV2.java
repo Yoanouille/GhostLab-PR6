@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import javax.net.ssl.SNIHostName;
-
 public class ClientV2 implements Runnable {
     private Socket socket;
 

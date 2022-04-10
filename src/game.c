@@ -21,6 +21,7 @@ game *gen_game(int w, int h) {
 void free_game(game *g) {
     destroy_lab(g->lab);
     remove_all(g->players);
+    close(g->fd);
     free(g);
 }
 
@@ -81,6 +82,11 @@ game_list *remove_game(game_list *l, int id_game) {
     }
     l->next = remove_game(l->next, id_game);
     return l;
+}
+
+int all_started(player_list *pl) {
+    if(pl == NULL) return 1;
+    return pl->p->bool_start_send && all_started(pl->next);
 }
 
 void destroy_game_list(game_list *l) {

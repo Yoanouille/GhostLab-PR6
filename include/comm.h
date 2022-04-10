@@ -17,4 +17,6 @@ int req_Size(player *p, char *mess, game_list *l);
 int req_List(player *p, char *mess, game_list *l);
 void req_list_player(int sock, player_list *pl);
 
+int send_welcome(player *p);
+
 #endif

@@ -148,3 +148,7 @@ void req_list_player(int sock, player_list *pl) {
     mySend(sock, res, 17);
     req_list_player(sock, pl->next);
 }
+
+int send_welcome(player *p) {
+    return 0;
+}
