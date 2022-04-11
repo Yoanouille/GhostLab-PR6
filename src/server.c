@@ -52,20 +52,13 @@ int traitement (player *p,char* mess,int* running){
         p->bool_start_send = 1;
         if(p->his_game != NULL) {
             if(all_started(p->his_game->players)) {
-                uint64_t c = 1;
-                if(write(p->his_game->fd, &c, sizeof(u_int64_t)) < sizeof(uint64_t)) {
-                    perror("write/notify");
-                    exit(EXIT_FAILURE);
-                }
+                //Init la game
+                //Send Welcome à tout le monde
                 //Lancer un Thread pour la game !
                 pthread_mutex_unlock(&lock);
             } else {  
                 pthread_mutex_unlock(&lock);  
-                fd_set read_fd;
-                FD_ZERO(&read_fd);
-                FD_SET(p->his_game->fd, &read_fd);
                 
-                select(p->his_game->fd + 1, &read_fd, NULL, NULL, NULL);
             }
             //SEND WELCOME
         } else pthread_mutex_unlock(&lock);
@@ -104,6 +97,7 @@ void *communication(void *arg){
     int pre = 0;
     int prepre = 0;
     int running = 1;
+    int len = 200;
     while(running) {
         int re = recv(p->sock, buff, SIZE,0);
         //printf("%d\n", re);
@@ -114,26 +108,31 @@ void *communication(void *arg){
             dprintf(2,"Client closed connection\n");
             break;
         }
+        
         for(int i = 0; i < re; i++) {
-            if(buff[i] == '*') {
-                
-                if(prepre) {
-                    if(traitement(p,mess,&running) != EXIT_SUCCESS){
-                        running = 0;
-                        break;
-                    }
-                    memset(mess, 0, 200);
-                    x = 0;
-                } 
-                else if(pre) prepre = 1;
-                else pre = 1;
-            } else {
-                pre = 0;
-                prepre = 0;
-                mess[x] = buff[i];
-                x++;
+            mess[x] = buff[i];
+            x++;
+            if(x == 5) {
+                if(strncmp(mess,"NEWPL",5) == 0) len = 22;
+                else if (strncmp(mess,"REGIS",5) == 0) len = 24;
+                else if (strncmp(mess,"UNREG",5) == 0) len = 8;
+                else if (strncmp(mess,"SIZE?",5) == 0) len = 10;
+                else if (strncmp(mess,"LIST?",5) == 0) len = 12;
+                else if (strncmp(mess,"GAME?",5) == 0) len = 8;
+                else if (strncmp(mess,"START",5) == 0) len = 8;
+                else {
+                    running = 0;
+                    break;
+                }
+            }
+            if(x == len) {
+                traitement(p, mess, &running);
+                len = 200;
+                x = 0;
+                memset(mess, 0, 200);
             }
         }
+
         if(re == -1) {
             perror("read");
             return NULL ;

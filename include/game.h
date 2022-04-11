@@ -12,7 +12,8 @@ typedef struct game {
     player_list *players;
     lab *lab;
     int bool_started;
-    int fd; //Faudra pas Oublier de le close !!!!!!
+    int sock_udp;
+    struct sockaddr_in *multi_addr;
     //et les fantomes
     
 } game;
@@ -38,5 +39,7 @@ void destroy_game_list(game_list *l);
 game *get_game(game_list *l, int id);
 //game *get_player_game(game_list *l,player *p);
 int size_list_game(game_list *l);
+
+void init_game(game *g);
 
 #endif
