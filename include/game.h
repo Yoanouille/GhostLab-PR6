@@ -1,10 +1,13 @@
 #ifndef GAME_H
 #define GAME_H
+#include <endian.h>
 #include "player.h"
 #include "lab.h"
 
 typedef struct player_list player_list;
 typedef struct player player;
+
+int port = 1111;
 
 typedef struct game {
     int id;
@@ -12,7 +15,8 @@ typedef struct game {
     player_list *players;
     lab *lab;
     int bool_started;
-    int fd; //Faudra pas Oublier de le close !!!!!!
+    int sock_udp;
+    struct sockaddr_in addr;
     //et les fantomes
     
 } game;

@@ -14,6 +14,7 @@ game *gen_game(int w, int h) {
     g->id = 0;
     g->num_player = 0;
     g->bool_started = 0;
+    g->sock_udp = 0;
 
     return g;
 }
@@ -21,7 +22,6 @@ game *gen_game(int w, int h) {
 void free_game(game *g) {
     destroy_lab(g->lab);
     remove_all(g->players);
-    close(g->fd);
     free(g);
 }
 

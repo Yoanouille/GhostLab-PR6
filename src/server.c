@@ -52,20 +52,13 @@ int traitement (player *p,char* mess,int* running){
         p->bool_start_send = 1;
         if(p->his_game != NULL) {
             if(all_started(p->his_game->players)) {
-                uint64_t c = 1;
-                if(write(p->his_game->fd, &c, sizeof(u_int64_t)) < sizeof(uint64_t)) {
-                    perror("write/notify");
-                    exit(EXIT_FAILURE);
-                }
+                //Init la game
+                init_game(p->his_game);
                 //Lancer un Thread pour la game !
                 pthread_mutex_unlock(&lock);
             } else {  
                 pthread_mutex_unlock(&lock);  
-                fd_set read_fd;
-                FD_ZERO(&read_fd);
-                FD_SET(p->his_game->fd, &read_fd);
-                
-                select(p->his_game->fd + 1, &read_fd, NULL, NULL, NULL);
+                //RIEN
             }
             //SEND WELCOME
         } else pthread_mutex_unlock(&lock);
@@ -82,6 +75,7 @@ int traitement (player *p,char* mess,int* running){
 You treat the communication protocol between server and ONE client
 */
 void *communication(void *arg){
+    srand(time(NULL));
     player *p = (player *) (arg);
     //First message send is the number of games
     char message[10];
