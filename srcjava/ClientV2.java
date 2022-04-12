@@ -1,10 +1,12 @@
 package srcjava;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.Socket;
 
 import javax.net.ssl.SNIHostName;
+import javax.swing.*;
 
 public class ClientV2 implements Runnable {
     private Socket socket;
@@ -13,12 +15,15 @@ public class ClientV2 implements Runnable {
 
     private final static int buff_size = 256;
 
+    public Fenetre fe;
+
     //private String send = "GAME?";
     private int count_ogame = 0;
     private int count_list = 0;
 
     public ClientV2(InetAddress addr, int port) throws IOException {
         socket = new Socket(addr, port);
+        fe = new Fenetre(this);
     }
 
 
@@ -88,6 +93,7 @@ public class ClientV2 implements Runnable {
 
     public void parseReq(byte[] res, int len) {
         String begin = new String(res, 0, 5);
+        System.out.println(new String(res,0,len));
         switch(begin) {
             case "GAMES" :
                 errorOgame();
@@ -153,7 +159,6 @@ public class ClientV2 implements Runnable {
                 break;
 
             case "PLAYR" :
-                errorPlayr();
                 errorOgame();
                 resPlayr(res, len);
                 break;
@@ -235,6 +240,12 @@ public class ClientV2 implements Runnable {
             System.exit(1);
         }
         count_ogame = res[6];
+        Runnable run=new Runnable(){
+            public void run(){
+                fe.reset_games();
+            }
+        };
+        SwingUtilities.invokeLater(run);
         //ICI Mettre à 0 la liste dans l'interface graphique
         System.out.println("Je vais recevoir " + res[6] + " messages OGAME !");
     }
@@ -245,6 +256,18 @@ public class ClientV2 implements Runnable {
             System.exit(1);
         }
         count_ogame--;
+        Runnable run=new Runnable(){
+            public void run(){
+                    fe.add_game("Partie " + (int) (res[6]) + " : " + res[8] + " joueur(s)");
+            }
+        };
+        try {
+            SwingUtilities.invokeAndWait(run);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
         //ICI ajouter à une liste dans l'interface graphique
         System.out.println("Partie " + res[6] + " : " + res[8] + " joueur(s)");
         if(count_ogame == 0) {
@@ -260,7 +283,7 @@ public class ClientV2 implements Runnable {
             System.out.println("Error len recv REGOK");
             System.exit(1);
         }
-        System.out.println("Vous avez été bien inscrit à la partie " + res[6]);
+        System.out.println("Vous avez été bien inscrit à la partie " + (res[6] & 0xff));
         //send = "";
         //ICI Actualiser l'interface !
     }
@@ -305,6 +328,7 @@ public class ClientV2 implements Runnable {
 
         //send = "";
         System.out.println("Taille du lab : " + w + "x" + h + " (wxh)");
+        fe.getAccueil().info.setText("Taille du lab : " + w + "x" + h + " (w x h)");
 
         //ICI Actualiser l'interface graphique !
     }
@@ -316,6 +340,8 @@ public class ClientV2 implements Runnable {
         }
         System.out.println("Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]);
         count_list = res[8];
+
+        fe.getAccueil().info.setText("Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]);
         //send = "";
         //ICI Actualiser l'interface graphique
     }
@@ -326,6 +352,10 @@ public class ClientV2 implements Runnable {
             System.exit(1);
         }
         String nom = new String(res, 6, 8);
+        
+        String base = fe.getAccueil().info.getText();
+        fe.getAccueil().info.setText(base+":\n"+nom);
+
         //Ajouter le nom dans une liste
         System.out.println("\t" + nom);
         count_list--;
@@ -334,7 +364,6 @@ public class ClientV2 implements Runnable {
             System.out.println("J'ai reçu tout les PLAYR");
         }
     }
-
 
 
 }

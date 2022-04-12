@@ -21,11 +21,11 @@ public class Main {
             // c.reqGame();
             ClientV2 c = new ClientV2(InetAddress.getByName(addr), port);
             new Thread(c).start();
-            c.reqNewPL("JEANCLAU", 7777);
-            c.reqGame();
-            c.reqSize(0);
-            c.reqSize(1);
-            c.reqRegis("Jules", 7777, 0);
+            // c.reqNewPL("JEANCLAU", 7777);x
+            // c.reqGame();
+            // c.reqSize(0);
+            // c.reqSize(1);
+            // c.reqRegis("Jules", 7777, 0);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
