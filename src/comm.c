@@ -2,7 +2,7 @@
 #include <endian.h>
 
 
-
+static int multi_port = 1111;
 
 int mySend(int sock,char* message,int size){
     int size_send = 0;
@@ -155,8 +155,8 @@ void req_list_player(int sock, player_list *pl) {
 
 void init_game(game *g) {
     //Initialisation de la socket
-    int his_port = 1111;
-    his_port++;
+    int his_port = multi_port;
+    multi_port++;
     int sock = socket(PF_INET, SOCK_DGRAM, 0);
     if(sock == -1) {
         perror("socket udp init_game");
