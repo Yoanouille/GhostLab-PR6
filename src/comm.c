@@ -196,8 +196,8 @@ void init_joueur(player_list *p, lab *l, char *welcome) {
     p->p->y = y;
 
     mySend(p->p->sock, welcome, 39);
-    char mess[26];
-    snprintf(mess, 25, "POSIT %s %03d %03d***", p->p->id, x, y);
+    char mess[42];
+    snprintf(mess, 42, "POSIT %s %03d %03d***", p->p->id, x, y);
     mySend(p->p->sock, mess, 25);    
     init_joueur(p->next, l, welcome);
 }
