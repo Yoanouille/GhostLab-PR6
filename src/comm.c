@@ -84,7 +84,7 @@ int req_Regis(player *p, char *mess, game_list *l) {
 
     char ok[] = "REGOK m***";
     ok[6] = g->id;
-    mySend(p->sock,ok,8);
+    mySend(p->sock,ok,10);
     return EXIT_SUCCESS;
 }
 
@@ -97,6 +97,7 @@ int req_unReg(player *p, game_list **l) {
     }
 
     remove_player_game(g,p->sock);
+    p->his_game = NULL;
     //Est-ce qu'on remove la game si il y a plus de joueur ?
     char ok[] = "UNROK m***";
     ok[6] = g->id;

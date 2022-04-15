@@ -284,6 +284,7 @@ public class ClientV2 implements Runnable {
             System.exit(1);
         }
         System.out.println("Vous avez été bien inscrit à la partie " + (res[6] & 0xff));
+        fe.getAccueil().reg = true;
         //send = "";
         //ICI Actualiser l'interface !
     }
@@ -304,6 +305,7 @@ public class ClientV2 implements Runnable {
             System.exit(1);
         }
         System.out.println("Vous vous êtes bien désinscrit de la partie " + res[6]);
+        fe.getAccueil().reg = false;
         //send = "";
         //ICI Actualiser l'interface !
     }

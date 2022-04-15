@@ -48,6 +48,10 @@ public class Accueil extends JPanel{
 
     private JButton size = new JButton("Size of lab");
 
+    private JButton unregister = new JButton ("Unregister");
+
+    public Boolean reg = false;
+
     public Accueil(Fenetre f) {
         this.fenetre = f;
         this.setLayout(gridLayout);
@@ -72,6 +76,10 @@ public class Accueil extends JPanel{
             }
         });
 
+        unregister.addActionListener((ActionEvent e) -> {
+            unreg();
+        });
+
         games_list.setVisibleRowCount(10);
         games_list.setLayoutOrientation(JList.VERTICAL);
         JScrollPane list = new JScrollPane(games_list);
@@ -89,6 +97,7 @@ public class Accueil extends JPanel{
         rightPane.add(register);
         rightPane.add(detail);
         rightPane.add(size);
+        rightPane.add(unregister);
         rightPane.add(info);
 
         this.add(rightPane);
@@ -100,29 +109,37 @@ public class Accueil extends JPanel{
 
     public void create_game() {
         //definir le port
-        try {
-            fenetre.getClient().reqNewPL(id.getText(), 6666);
-            fenetre.getClient().reqGame();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(!reg){
+            try {
+                fenetre.getClient().reqNewPL(id.getText(), 6666);
+                fenetre.getClient().reqGame();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            info.setText("You are registered in a game");
         }
     }
 
     public void register_to() {
         //definir le port
-        String g = games_list.getSelectedValue();
-        String s[] = g.split(":");
-        System.out.println(s[0]);
+        if(!reg){
+            String g = games_list.getSelectedValue();
+            String s[] = g.split(":");
+            System.out.println(s[0]);
 
-        s[0] = s[0].replaceAll("[^0-9]", "");
-        System.out.println(s[0]);
-        int m = Integer.parseInt(s[0]);
+            s[0] = s[0].replaceAll("[^0-9]", "");
+            System.out.println(s[0]);
+            int m = Integer.parseInt(s[0]);
 
-        try {
-            fenetre.getClient().reqRegis(id.getText(), 6666, m);
-            fenetre.getClient().reqGame();
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                fenetre.getClient().reqRegis(id.getText(), 6666, m);
+                fenetre.getClient().reqGame();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            info.setText("You are registered in a game");
         }
     }
 
@@ -153,6 +170,19 @@ public class Accueil extends JPanel{
             fenetre.getClient().reqSize(m);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void unreg(){
+        if(reg){
+            try {
+                fenetre.getClient().reqUnReg();
+                fenetre.getClient().reqGame();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            info.setText("You are not registered to any game");
         }
     }
     
