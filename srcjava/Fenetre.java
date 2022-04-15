@@ -3,6 +3,7 @@ package srcjava;
 import javax.swing.*;
 import java.awt.CardLayout;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 public class Fenetre extends JFrame {
@@ -47,11 +48,27 @@ public class Fenetre extends JFrame {
     }
 
     public void reset_games(){
-        acc.games.clear();
+        Runnable run=new Runnable(){
+            public void run(){
+                acc.games.clear();
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
 
-    public void add_game(String s){
-        acc.games.addElement(s);
+    public void add_game(int ngame, int nplayer){
+        Runnable run=new Runnable(){
+            public void run(){
+                acc.games.addElement("Partie " + ngame + " : " + nplayer + " joueur(s)");
+            }
+        };
+        try {
+            SwingUtilities.invokeAndWait(run);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
 }

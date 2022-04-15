@@ -194,8 +194,8 @@ public class Client {
             int[] res = new int[2];
 
             //TODO: va Falloir les convertir !!!! (en little endian ou big endian)
-            res[0] = ((data[8] & 0xff) << 8) | (data[9] & 0xff);
-            res[1] = ((data[11] & 0xff) << 8) | (data[12] & 0xff);
+            res[0] = ((data[9] & 0xff) << 8) | (data[8] & 0xff);
+            res[1] = ((data[12] & 0xff) << 8) | (data[11] & 0xff);
             System.out.println("Taille labyrinthe  partie " + data[6] + " : " + res[0] + "x" + res[1]);
             return res;
         } else if(verifyBegin(data, 0, "DUNNO")) {

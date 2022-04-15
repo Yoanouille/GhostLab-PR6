@@ -7,15 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ListModel;
+import javax.swing.*;
 import javax.swing.plaf.DimensionUIResource;
 
 import org.w3c.dom.events.Event;
@@ -44,7 +36,7 @@ public class Accueil extends JPanel{
 
     private JButton detail = new JButton("Details");
 
-    public JTextArea info = new JTextArea("Nothing for now");
+    public JLabel info = new JLabel("Nothing for now");
 
     private JButton size = new JButton("Size of lab");
 
@@ -126,10 +118,8 @@ public class Accueil extends JPanel{
         if(!reg){
             String g = games_list.getSelectedValue();
             String s[] = g.split(":");
-            System.out.println(s[0]);
 
             s[0] = s[0].replaceAll("[^0-9]", "");
-            System.out.println(s[0]);
             int m = Integer.parseInt(s[0]);
 
             try {
@@ -185,5 +175,7 @@ public class Accueil extends JPanel{
             info.setText("You are not registered to any game");
         }
     }
+
+
     
 }

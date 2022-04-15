@@ -14,6 +14,7 @@ game *gen_game(int w, int h) {
     g->id = 0;
     g->num_player = 0;
     g->bool_started = 0;
+    g->sock_udp = 0;
 
     return g;
 }
@@ -81,6 +82,11 @@ game_list *remove_game(game_list *l, int id_game) {
     }
     l->next = remove_game(l->next, id_game);
     return l;
+}
+
+int all_started(player_list *pl) {
+    if(pl == NULL) return 1;
+    return pl->p->bool_start_send && all_started(pl->next);
 }
 
 void destroy_game_list(game_list *l) {

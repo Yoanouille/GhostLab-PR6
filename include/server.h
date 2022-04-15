@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <endian.h>
+#include <sys/select.h>
 
 #include "game.h"
 #include "player.h"

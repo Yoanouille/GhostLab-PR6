@@ -48,6 +48,20 @@ int traitement (player *p,char* mess,int* running){
         return EXIT_SUCCESS;
     }else if (strncmp(mess,"START",5) == 0){
         //Start the game if all players sent start
+        pthread_mutex_lock(&lock);
+        p->bool_start_send = 1;
+        if(p->his_game != NULL) {
+            if(all_started(p->his_game->players)) {
+                //Init la game
+                init_game(p->his_game);
+                //Lancer un Thread pour la game !
+                pthread_mutex_unlock(&lock);
+            } else {  
+                pthread_mutex_unlock(&lock);  
+                //RIEN
+            }
+            //SEND WELCOME
+        } else pthread_mutex_unlock(&lock);
         return EXIT_SUCCESS;
     }else {
         char message [] = "GOBYE***";
@@ -61,6 +75,7 @@ int traitement (player *p,char* mess,int* running){
 You treat the communication protocol between server and ONE client
 */
 void *communication(void *arg){
+    srand(time(NULL));
     player *p = (player *) (arg);
     //First message send is the number of games
     char message[10];

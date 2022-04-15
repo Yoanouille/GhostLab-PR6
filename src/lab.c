@@ -137,7 +137,7 @@ void gen_lab(lab *l) {
 
     l->tab[0][0] = 1;
     list_wall *list = add_neighbors(l, NULL, 0, 0);
-    
+
     while(list != NULL) {
         int s = size(list);
         int r = rand() % s;

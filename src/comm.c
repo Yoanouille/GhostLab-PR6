@@ -2,6 +2,8 @@
 #include <endian.h>
 
 
+
+
 int mySend(int sock,char* message,int size){
     int size_send = 0;
     do{
@@ -148,4 +150,54 @@ void req_list_player(int sock, player_list *pl) {
     memcpy(res + 6, pl->p->id, 8);
     mySend(sock, res, 17);
     req_list_player(sock, pl->next);
+}
+
+
+void init_game(game *g) {
+    //Initialisation de la socket
+    int his_port = 1111;
+    his_port++;
+    int sock = socket(PF_INET, SOCK_DGRAM, 0);
+    if(sock == -1) {
+        perror("socket udp init_game");
+        exit(EXIT_FAILURE);
+    }
+    g->addr.sin_family = AF_INET;
+    g->addr.sin_port = htons(his_port);
+    if(inet_aton("225.1.2.4", &g->addr.sin_addr) == 0) {
+        dprintf(2, "Erreur inet_aton multicast init game\n");
+        exit(EXIT_FAILURE);
+    }
+
+    //Initialisation Welcome
+    char welcome[] = "WELCO m hh ww f 225.1.2.4###### port***";
+    welcome[6] = g->id;
+    welcome[8] = (g->lab->h)%256;
+    welcome[9] = (g->lab->h)/256;
+    welcome[11] = (g->lab->w)%256;
+    welcome[12] = (g->lab->w)/256;
+    welcome[14] = 1;
+    snprintf(welcome + 31, 7, "%d***", his_port);    
+
+    //Initialisation des joueurs
+    init_joueur(g->players, g->lab, welcome);
+}
+
+void init_joueur(player_list *p, lab *l, char *welcome) {
+    if(p == NULL) return;
+    int x = 0;
+    int y = 0;
+    do {
+        x = rand() % (l->w);
+        y = rand() % (l->h);
+    } while(l->tab[x][y] == 0);
+
+    p->p->x = x;
+    p->p->y = y;
+
+    mySend(p->p->sock, welcome, 39);
+    char mess[26];
+    snprintf(mess, 25, "POSIT %s %03d %03d***", p->p->id, x, y);
+    mySend(p->p->sock, mess, 25);    
+    init_joueur(p->next, l, welcome);
 }

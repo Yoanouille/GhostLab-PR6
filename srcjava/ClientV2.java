@@ -1,12 +1,8 @@
 package srcjava;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.Socket;
-
-import javax.net.ssl.SNIHostName;
-import javax.swing.*;
 
 public class ClientV2 implements Runnable {
     private Socket socket;
@@ -240,12 +236,7 @@ public class ClientV2 implements Runnable {
             System.exit(1);
         }
         count_ogame = res[6];
-        Runnable run=new Runnable(){
-            public void run(){
-                fe.reset_games();
-            }
-        };
-        SwingUtilities.invokeLater(run);
+        fe.reset_games();
         //ICI Mettre à 0 la liste dans l'interface graphique
         System.out.println("Je vais recevoir " + res[6] + " messages OGAME !");
     }
@@ -256,18 +247,7 @@ public class ClientV2 implements Runnable {
             System.exit(1);
         }
         count_ogame--;
-        Runnable run=new Runnable(){
-            public void run(){
-                    fe.add_game("Partie " + (int) (res[6]) + " : " + res[8] + " joueur(s)");
-            }
-        };
-        try {
-            SwingUtilities.invokeAndWait(run);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        fe.add_game((int) res[6],(int) (res[8]));
         //ICI ajouter à une liste dans l'interface graphique
         System.out.println("Partie " + res[6] + " : " + res[8] + " joueur(s)");
         if(count_ogame == 0) {
