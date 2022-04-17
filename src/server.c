@@ -60,9 +60,27 @@ int traitement (player *p,char* mess,int* running){
                 pthread_mutex_unlock(&lock);  
                 //RIEN
             }
-            //SEND WELCOME
         } else pthread_mutex_unlock(&lock);
         return EXIT_SUCCESS;
+    }else if(strncmp(mess, "UPMOV", 5) == 0) {
+        pthread_mutex_lock(&lock);
+        move(mess, p, p->his_game, 0);
+        pthread_mutex_unlock(&lock);
+    }
+    else if(strncmp(mess, "DOMOV", 5) == 0) {
+        pthread_mutex_lock(&lock);
+        move(mess, p, p->his_game, 1);
+        pthread_mutex_unlock(&lock);
+    }
+    else if(strncmp(mess, "LEMOV", 5) == 0) {
+        pthread_mutex_lock(&lock);
+        move(mess, p, p->his_game, 2);
+        pthread_mutex_unlock(&lock);
+    }
+    else if(strncmp(mess, "RIMOV", 5) == 0) {
+        pthread_mutex_lock(&lock);
+        move(mess, p, p->his_game, 3);
+        pthread_mutex_unlock(&lock);
     }else {
         char message [] = "GOBYE***";
         mySend(p->sock,message,8);

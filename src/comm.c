@@ -154,7 +154,7 @@ void req_list_player(int sock, player_list *pl) {
 
 
 void init_game(game *g) {
-    //Initialisation de la socket
+    //Initialisation de la socket UDP
     int his_port = multi_port;
     multi_port++;
     int sock = socket(PF_INET, SOCK_DGRAM, 0);
@@ -168,6 +168,8 @@ void init_game(game *g) {
         dprintf(2, "Erreur inet_aton multicast init game\n");
         exit(EXIT_FAILURE);
     }
+
+    place_ghost(g->ghosts, nb_ghost, g->lab);
 
     //Initialisation Welcome
     char welcome[] = "WELCO m hh ww f 225.1.2.4###### port***";
@@ -200,4 +202,63 @@ void init_joueur(player_list *p, lab *l, char *welcome) {
     snprintf(mess, 42, "POSIT %s %03d %03d***", p->p->id, x, y);
     mySend(p->p->sock, mess, 25);    
     init_joueur(p->next, l, welcome);
+}
+
+
+void send_move(player *p) {
+    char mess[42];
+    snprintf(mess, 42, "MOVE! %03d %03d***", p->x, p->y);
+    mySend(p->sock, mess, 16);
+}
+
+void send_move_points(player *p) {
+    char mess[42];
+    snprintf(mess, 42, "MOVEF %03d %03d %04d***", p->x, p->y, p->score);
+    mySend(p->sock, mess, 21);
+}
+
+//0 -> UP | 1 -> DOWN | 2 -> LEFT | 3 -> RIGHT
+void move(char *mess, player *p, game *g, int dir) {
+    int d = atoi(mess + 6);
+    printf("Il se déplace de %d cases\n", d);
+    int score = 0;
+    int end = 0;
+    int dx = 0;
+    int dy = 0;
+    switch(dir) {
+        case 0 : 
+            dx = -1;
+            dy = 0;
+            break;
+        case 1 : 
+            dx = 1;
+            dy = 0;
+            break;
+        case 2 :
+            dx = 0;
+            dy = -1;
+        case 3 :
+            dx = 0;
+            dy = 1;
+            break;
+    }
+    for(int i = 0; i < d; i++) {
+        if(g->lab->tab[p->x + dx][p->y + dy] == 0) break;
+        if(is_on_ghost(g->ghosts, nb_ghost, p->x + dx, p->y + dy)){
+            score += 100;
+            //ENVOYER MESSAGE UDP
+            if(all_catched(g->ghosts, nb_ghost)) {
+                end = 1;
+            }
+        } 
+        p->x += dx;
+        p->y += dy;
+    }
+    p->score += score;
+    if(score == 0) send_move(p);
+    else send_move_points(p);
+
+    if(end){ //ENVOYER MESSAGE END
+        printf("SEND END\n");
+    }
 }

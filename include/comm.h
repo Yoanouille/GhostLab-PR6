@@ -5,7 +5,7 @@
 
 #include "game.h"
 #include "player.h"
-
+#include "ghost.h"
 
 int mySend(int sock,char *message,int size);
 void send_game(int sock, game_list *l);
@@ -20,6 +20,7 @@ void req_list_player(int sock, player_list *pl);
 
 void init_game(game *g);
 void init_joueur(player_list *p, lab *l, char *welcome);
+void move(char *mess, player *p, game *g, int dir);
 
 
 #endif

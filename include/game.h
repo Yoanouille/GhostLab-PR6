@@ -3,6 +3,9 @@
 #include <endian.h>
 #include "player.h"
 #include "lab.h"
+#include "ghost.h"
+
+#define nb_ghost 5
 
 typedef struct player_list player_list;
 typedef struct player player;
@@ -15,8 +18,8 @@ typedef struct game {
     int bool_started;
     int sock_udp;
     struct sockaddr_in addr;
-    //et les fantomes
-    
+    ghost ghosts[nb_ghost];
+ 
 } game;
 
 typedef struct game_list game_list;
