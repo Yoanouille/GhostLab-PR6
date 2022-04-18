@@ -35,4 +35,6 @@ void remove_all(player_list *l);
 player *get_player(player_list *l, char *id);
 player *get_player_from_sock(player_list *l, int sock);
 
+void print_player_list(player_list *l);
+
 #endif

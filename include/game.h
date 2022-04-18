@@ -43,5 +43,6 @@ void destroy_game_list(game_list *l);
 game *get_game(game_list *l, int id);
 //game *get_player_game(game_list *l,player *p);
 int size_list_game(game_list *l);
+int size_list_game_active(game_list *l);
 
 #endif

@@ -113,3 +113,7 @@ int size_list_game(game_list *l) {
     if(l == NULL) return 0;
     else return 1 + size_list_game(l->next);
 }
+int size_list_game_active(game_list *l) {
+    if(l == NULL) return 0;
+    else return (l->g->bool_started ? 0 : 1) + size_list_game(l->next);   
+}

@@ -38,10 +38,12 @@ public class ClientV2 implements Runnable {
             try {
                 int re = socket.getInputStream().read(buf, 0, buff_size);
                 for(int i = 0; i < re; i++) {
+                 //   System.out.print(buf[i] + " ");
                     req[len] = buf[i];
                     len++;
                     if(buf[i] == '*') {
                         if(prepre) {
+                          //  System.out.println();
                             parseReq(req, len);
                             len = 0;
                             pre = false;
@@ -169,6 +171,7 @@ public class ClientV2 implements Runnable {
     public void reqNewPL(String id, int port) throws IOException {
         //send = "NEWPL";
         byte[] data = ("NEWPL "+id+" "+Integer.toString(port)+"***").getBytes();
+        //System.out.println(new String(data, 0, data.length));
         socket.getOutputStream().write(data);
         socket.getOutputStream().flush();
     }

@@ -103,7 +103,7 @@ public class Accueil extends JPanel{
         //definir le port
         if(!reg){
             try {
-                fenetre.getClient().reqNewPL(id.getText(), 6666);
+                fenetre.getClient().reqNewPL("Billy_01", 6666);
                 fenetre.getClient().reqGame();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -123,7 +123,7 @@ public class Accueil extends JPanel{
             int m = Integer.parseInt(s[0]);
 
             try {
-                fenetre.getClient().reqRegis(id.getText(), 6666, m);
+                fenetre.getClient().reqRegis("Billy_01", 6666, m);
                 fenetre.getClient().reqGame();
             } catch (IOException e) {
                 e.printStackTrace();

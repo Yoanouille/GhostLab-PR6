@@ -86,3 +86,12 @@ player *get_player_from_sock(player_list *l, int sock){
     if(l->p->sock == sock) return l->p;
     return get_player_from_sock(l->next, sock);
 }
+
+void print_player_list(player_list *l) {
+    if(l == NULL) {
+        printf("\n");
+        return;
+    }
+    printf("%d ", l->p->sock);
+    print_player_list(l->next);
+}

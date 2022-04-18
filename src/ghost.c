@@ -7,7 +7,7 @@ void place_ghost(ghost *g, int len, lab *l) {
         do {
             x = rand() % (l->w);
             y = rand() % (l->h);
-        } while(l->tab[x][y] == 0);
+        } while(l->tab[y][x] == 0);
         g[i].x = x;
         g[i].y = y;
         g[i].catched = 0;

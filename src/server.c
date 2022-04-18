@@ -7,7 +7,7 @@ pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 //Function used on one message
 
-int traitement (player *p,char* mess,int* running){
+int traitement (player *p,char* mess,int* running, int len){
     printf("%s\n", mess);
     if(strncmp(mess,"NEWPL",5) == 0){
         pthread_mutex_lock(&lock);
@@ -43,7 +43,6 @@ int traitement (player *p,char* mess,int* running){
         //List of still not launched games
         pthread_mutex_lock(&lock);
         send_game(p->sock, g_list);
-        send_ogame(p->sock, g_list);
         pthread_mutex_unlock(&lock);
         return EXIT_SUCCESS;
     }else if (strncmp(mess,"START",5) == 0){
@@ -81,11 +80,28 @@ int traitement (player *p,char* mess,int* running){
         pthread_mutex_lock(&lock);
         move(mess, p, p->his_game, 3);
         pthread_mutex_unlock(&lock);
-    }else {
+
+    } else if(strncmp(mess, "GLIS?", 5) == 0) {
+        pthread_mutex_lock(&lock);
+        req_glis(p->his_game, p);
+        return EXIT_SUCCESS;
+        pthread_mutex_unlock(&lock);
+    } else if(strncmp(mess, "IQUIT", 5) == 0) {
+        char message [] = "GOBYE***";
+        mySend(p->sock,message,8);
+        return EXIT_FAILURE;
+    } else if (strncmp(mess, "MALL?", 5) == 0){
+        char *m = mess + 6;
+        len -= 6;
+        pthread_mutex_lock(&lock);
+        pthread_mutex_unlock(&lock);
+    }
+    else {
         char message [] = "GOBYE***";
         mySend(p->sock,message,8);
         return EXIT_FAILURE;
     }
+    return EXIT_FAILURE;
 }
 
 
@@ -102,7 +118,6 @@ void *communication(void *arg){
     pthread_mutex_lock(&lock);
    
     send_game(p->sock, g_list);
-    send_ogame(p->sock, g_list);
     pthread_mutex_unlock(&lock);
     
     //Buffer where we receive data
@@ -130,7 +145,7 @@ void *communication(void *arg){
             if(buff[i] == '*') {
                 
                 if(prepre) {
-                    if(traitement(p,mess,&running) != EXIT_SUCCESS){
+                    if(traitement(p,mess,&running, x) != EXIT_SUCCESS){
                         running = 0;
                         break;
                     }
@@ -154,9 +169,14 @@ void *communication(void *arg){
 
     printf("FIN THREAD\n");
 
+    pthread_mutex_lock(&lock);
     if(p->his_game != NULL) {
         remove_player_game(p->his_game, p->sock);
+        if(p->his_game->num_player == 0) {
+            g_list = remove_game(g_list, p->his_game->id);
+        }
     }
+    pthread_mutex_unlock(&lock);
     close(p->sock);
     free(arg);
     return NULL;
