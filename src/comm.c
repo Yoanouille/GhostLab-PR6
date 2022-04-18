@@ -21,8 +21,19 @@ int mySend(int sock,char* message,int size){
     return size_send;
 }
 
+void send_ogame(game_list *l, char *mess) {
+    if(l == NULL) return;
+    if(l->g->bool_started == 0) {
+        char mess_bis[] = "OGAME m s***";
+        mess_bis[6] = l->g->id;
+        mess_bis[8] = l->g->num_player;
+        memcpy(mess, mess_bis, 12);
+    }
+    send_ogame(l->next, mess + 12);
+}
 
-void send_game(int sock, game_list *l) {
+
+int send_game(int sock, game_list *l) {
     uint8_t nb_game = size_list_game_active(l);
     char mess[10 + nb_game * 12];
     memset(mess, 0, 10 + nb_game * 12);
@@ -35,18 +46,9 @@ void send_game(int sock, game_list *l) {
 
     send_ogame(l, mess + 10);
 
-    mySend(sock, mess, 10 + nb_game * 12);
-}
+    if(mySend(sock, mess, 10 + nb_game * 12) == -1) return EXIT_FAILURE;
 
-void send_ogame(game_list *l, char *mess) {
-    if(l == NULL) return;
-    if(l->g->bool_started == 0) {
-        char mess_bis[] = "OGAME m s***";
-        mess_bis[6] = l->g->id;
-        mess_bis[8] = l->g->num_player;
-        memcpy(mess, mess_bis, 12);
-    }
-    send_ogame(l->next, mess + 12);
+    return EXIT_SUCCESS;
 }
 
 int req_newPl(player *p, char *mess, game_list **l) {
@@ -61,7 +63,7 @@ int req_newPl(player *p, char *mess, game_list **l) {
         *l = remove_game(*l,255);
         p->his_game = NULL;
         char no[] = "REGNO***";
-        mySend(p->sock,no,8);
+        if(mySend(p->sock,no,8) == -1) return EXIT_FAILURE;
         return EXIT_SUCCESS;
     }
     
@@ -71,7 +73,7 @@ int req_newPl(player *p, char *mess, game_list **l) {
     p->addr.sin_port = htons(atoi(port));
     char ok[] = "REGOK m***";
     ok[6] = g->id;
-    mySend(p->sock,ok,10);
+    if(mySend(p->sock,ok,10) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
 
@@ -82,7 +84,7 @@ int req_Regis(player *p, char *mess, game_list *l) {
     game *g = get_game(l,m);
     if(get_player(g->players,p->id) != NULL || p->bool_start_send || g->bool_started){
         char no[] = "REGNO***";
-        mySend(p->sock,no,8);
+        if(mySend(p->sock,no,8) == -1) return EXIT_FAILURE;
         return EXIT_SUCCESS;
     }
     
@@ -96,7 +98,7 @@ int req_Regis(player *p, char *mess, game_list *l) {
 
     char ok[] = "REGOK m***";
     ok[6] = g->id;
-    mySend(p->sock,ok,10);
+    if(mySend(p->sock,ok,10) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
 
@@ -104,7 +106,7 @@ int req_unReg(player *p, game_list **l) {
     game *g = p->his_game;
     if(g == NULL || p->bool_start_send || g->bool_started){
         char dunno[] = "DUNNO***";
-        mySend(p->sock,dunno,8);
+        if(mySend(p->sock,dunno,8) == -1) return EXIT_FAILURE;
         return EXIT_SUCCESS;
     }
 
@@ -115,7 +117,7 @@ int req_unReg(player *p, game_list **l) {
     p->his_game = NULL;
     char ok[] = "UNROK m***";
     ok[6] = g->id;
-    mySend(p->sock,ok,10);
+    if(mySend(p->sock,ok,10) == -1) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
@@ -125,7 +127,7 @@ int req_Size(player *p, char *mess, game_list *l) {
     game *g = get_game(l,m);
     if(g == NULL || p->bool_start_send){
         char dunno[] = "DUNNO***";
-        mySend(p->sock,dunno,8);
+        if(mySend(p->sock,dunno,8) == -1) return EXIT_FAILURE;
         return EXIT_SUCCESS;
     }
     char res[] = "SIZE! m hh ww***";
@@ -134,7 +136,7 @@ int req_Size(player *p, char *mess, game_list *l) {
     *(uint16_t *)(res + 8) = htole16(g->lab->h);
     *(uint16_t *)(res + 11) = htole16(g->lab->w);
 
-    mySend(p->sock, res, 16);
+    if(mySend(p->sock, res, 16) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
 
@@ -151,7 +153,7 @@ int req_List(player *p, char *mess, game_list *l) {
     game *g = get_game(l, m);
     if(g == NULL || p->bool_start_send){
         char dunno[] = "DUNNO***";
-        mySend(p->sock,dunno,8);
+        if(mySend(p->sock,dunno,8) == -1) return EXIT_FAILURE;
         return EXIT_SUCCESS;
     }
 
@@ -163,11 +165,11 @@ int req_List(player *p, char *mess, game_list *l) {
 
     req_list_player(g->players, res + 12);
 
-    mySend(p->sock, res, 12 + 17 * g->num_player);
+    if(mySend(p->sock, res, 12 + 17 * g->num_player) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
 
-void init_game(game *g) {
+int init_game(game *g) {
     //Initialisation de la socket UDP
     int his_port = multi_port;
     multi_port++;
@@ -196,11 +198,11 @@ void init_game(game *g) {
     snprintf(welcome + 31, 7, "%d***", his_port);    
 
     //Initialisation des joueurs
-    init_joueur(g->players, g->lab, welcome);
+    return init_joueur(g->players, g->lab, welcome);
 }
 
-void init_joueur(player_list *p, lab *l, char *welcome) {
-    if(p == NULL) return;
+int init_joueur(player_list *p, lab *l, char *welcome) {
+    if(p == NULL) return EXIT_SUCCESS;
     int x = 0;
     int y = 0;
     do {
@@ -211,28 +213,32 @@ void init_joueur(player_list *p, lab *l, char *welcome) {
     p->p->x = x;
     p->p->y = y;
 
-    mySend(p->p->sock, welcome, 39);
+    int r = EXIT_SUCCESS;
+    if(mySend(p->p->sock, welcome, 39) == -1) r = EXIT_FAILURE;
     char mess[42];
     snprintf(mess, 42, "POSIT %s %03d %03d***", p->p->id, x, y);
-    mySend(p->p->sock, mess, 25);    
-    init_joueur(p->next, l, welcome);
+    if(mySend(p->p->sock, mess, 25) == -1) r = EXIT_FAILURE;    
+    if(r == EXIT_SUCCESS) r = init_joueur(p->next, l, welcome);
+    return r;
 }
 
 
-void send_move(player *p) {
+int send_move(player *p) {
     char mess[42];
     snprintf(mess, 42, "MOVE! %03d %03d***", p->x, p->y);
-    mySend(p->sock, mess, 16);
+    if(mySend(p->sock, mess, 16) == -1) return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
-void send_move_points(player *p) {
+int send_move_points(player *p) {
     char mess[42];
     snprintf(mess, 42, "MOVEF %03d %03d %04d***", p->x, p->y, p->score);
-    mySend(p->sock, mess, 21);
+    if(mySend(p->sock, mess, 21) == -1) return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 //0 -> UP | 1 -> DOWN | 2 -> LEFT | 3 -> RIGHT
-void move(char *mess, player *p, game *g, int dir) {
+int move(char *mess, player *p, game *g, int dir) {
     int d = atoi(mess + 6);
     printf("Il se déplace de %d cases\n", d);
     int score = 0;
@@ -269,12 +275,14 @@ void move(char *mess, player *p, game *g, int dir) {
         p->y += dy;
     }
     p->score += score;
-    if(score == 0) send_move(p);
-    else send_move_points(p);
+    int re;
+    if(score == 0) re = send_move(p);
+    else re = send_move_points(p);
 
     if(end){ //ENVOYER MESSAGE END
         printf("SEND END\n");
     }
+    return re;
 }
 
 void send_gplyr(player_list *p, char *mess) {
@@ -286,13 +294,14 @@ void send_gplyr(player_list *p, char *mess) {
     send_gplyr(p->next, mess + 30);
 }
 
-void req_glis(game *g, player *p) {
+int req_glis(game *g, player *p) {
     char res[10 + g->num_player * 30];
     memcpy(res, "GLIS! s***", 10);
     res[6] = g->num_player;
 
     send_gplyr(g->players, res + 10);
-    mySend(p->sock, res, 10 + g->num_player * 30);
+    if(mySend(p->sock, res, 10 + g->num_player * 30) == -1) return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 int send_mess_all(char *mess, int len, player *p) {
@@ -301,13 +310,52 @@ int send_mess_all(char *mess, int len, player *p) {
     copy[len] = 0;
     printf("MESS : %s\n", copy);
 
-    int r = sendto(p->his_game->sock_udp, mess, len, 0, (struct sockaddr *)&p->his_game->addr, sizeof(struct sockaddr_in));
+    char res[18 + len];
+    memcpy(res, "MESSA ", 6);
+    memcpy(res + 6, p->id, 8);
+    res[14] = ' ';
+    memcpy(res + 15, mess, len);
+    memcpy(res + 15 + len, "+++", 3);
+
+    printf("REPONSE MALL : %s\n", res);
+ 
+    int r = sendto(p->his_game->sock_udp, res, 18 + len, 0, (struct sockaddr *)&p->his_game->addr, sizeof(struct sockaddr_in));
     if(r == -1) return EXIT_FAILURE;
-    
-    //VERIF r
 
     char rep[] = "MALL!***";
-    mySend(p->sock, rep, 8);
+    if(mySend(p->sock, rep, 8) == -1) return EXIT_FAILURE;
     
+    return EXIT_SUCCESS;
+}
+
+int send_mess_perso(char *req, int len, player *p) {
+    char id[9];
+    memcpy(id, req + 6, 8);
+    id[8] = 0;
+    printf("Il faut envoyé à : %s\n", id);
+
+    char *mess = req + 15;
+    len -= 18;
+
+    if(get_player(p->his_game->players, id) == NULL) {
+        char rep[] = "NSEND***";
+        if(mySend(p->sock, rep, 8) == -1) return EXIT_FAILURE;
+        return EXIT_SUCCESS;
+    }
+
+    char res[18 + len];
+    memcpy(res, "MESSP ", 6);
+    memcpy(res + 6, p->id, 8);
+    res[14] = ' ';
+    memcpy(res + 15, mess, len);
+    memcpy(res + 15 + len, "+++", 3);
+
+    printf("REPONSE MESSP : %s\n", res);
+
+    int r = sendto(p->his_game->sock_udp, res, 18 + len, 0, (struct sockaddr *)&p->his_game->addr, sizeof(struct sockaddr_in));
+    if(r == -1) return EXIT_FAILURE;
+
+    char rep[] = "SEND!***";
+    if(mySend(p->sock, rep, 8) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
