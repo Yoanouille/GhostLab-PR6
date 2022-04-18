@@ -97,7 +97,9 @@ int traitement (player *p,char* mess,int* running, int len){
         send_mess_all(m, len, p);
         pthread_mutex_unlock(&lock);
     } else if(strncmp(mess, "SEND?", 5) == 0) {
-        
+        pthread_mutex_lock(&lock);
+        send_mess_perso(mess, len, p);
+        pthread_mutex_unlock(&lock);
     }
     else {
         char message [] = "GOBYE***";

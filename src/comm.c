@@ -222,6 +222,35 @@ int init_joueur(player_list *p, lab *l, char *welcome) {
     return r;
 }
 
+int send_ghost(game *g, int x, int y) {
+    char mess[50];
+    snprintf(mess, 50, "GHOST %03d %03d+++", x, y);
+    int r = sendto(g->sock_udp, mess, 16, 0, (struct sockaddr *)&(g->addr), sizeof(struct sockaddr_in));
+    return r;
+}
+
+int send_score(player *p, int x, int y, int point) {
+    char mess[100];
+    snprintf(mess, 100, "SCORE %s %04d %03d %03d+++", p->id, point, x, y);
+    int r = sendto(p->his_game->sock_udp, mess, 30, 0, (struct sockaddr *)&(p->his_game->addr), sizeof(struct sockaddr_in));
+    return r;
+}
+
+player *get_winner(player_list *p, player *best_p) {
+    if(p == NULL) return best_p;
+    if(best_p == NULL) return get_winner(p->next, p->p);
+    if(p->p->score > best_p->score) return get_winner(p->next, p->p);
+    else return get_winner(p->next, best_p);
+}
+
+int send_end(game *g) {
+    player *best = get_winner(g->players, NULL);
+
+    char mess[50];
+    snprintf(mess, 50, "ENDGA %s %04d+++", best->id, best->score);
+    int r = sendto(g->sock_udp, mess, 22, 0, (struct sockaddr *)&(g->addr), sizeof(struct sockaddr_in));
+    return r;
+}
 
 int send_move(player *p) {
     char mess[42];
@@ -267,6 +296,7 @@ int move(char *mess, player *p, game *g, int dir) {
         if(is_on_ghost(g->ghosts, nb_ghost, p->x + dx, p->y + dy)){
             score += 100;
             //ENVOYER MESSAGE UDP
+            send_score(p, p->x + dx, p->y + dy, p->score + score);
             if(all_catched(g->ghosts, nb_ghost)) {
                 end = 1;
             }
@@ -281,6 +311,7 @@ int move(char *mess, player *p, game *g, int dir) {
 
     if(end){ //ENVOYER MESSAGE END
         printf("SEND END\n");
+        send_end(p->his_game);
     }
     return re;
 }
