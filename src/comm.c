@@ -82,7 +82,7 @@ int req_Regis(player *p, char *mess, game_list *l) {
     p->id[8] = '\0';
     char m = mess[20];
     game *g = get_game(l,m);
-    if(get_player(g->players,p->id) != NULL || p->bool_start_send || g->bool_started){
+    if(g == NULL || get_player(g->players,p->id) != NULL || p->bool_start_send || g->bool_started){
         char no[] = "REGNO***";
         if(mySend(p->sock,no,8) == -1) return EXIT_FAILURE;
         return EXIT_SUCCESS;
