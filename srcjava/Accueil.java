@@ -6,9 +6,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Arrays;
 
 import javax.swing.*;
 import javax.swing.plaf.DimensionUIResource;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 import org.w3c.dom.events.Event;
 
@@ -42,7 +46,38 @@ public class Accueil extends JPanel{
 
     private JButton unregister = new JButton ("Unregister");
 
+    private JButton refresh = new JButton ("refresh");
+
     public Boolean reg = false;
+
+    public class JTextFieldLimit extends PlainDocument {
+        private int limit;
+        // optional uppercase conversion
+        private boolean toUppercase = false;
+        
+        JTextFieldLimit(int limit) {
+         super();
+         this.limit = limit;
+         }
+         
+        JTextFieldLimit(int limit, boolean upper) {
+         super();
+         this.limit = limit;
+         toUppercase = upper;
+         }
+       
+        public void insertString
+          (int offset, String  str, AttributeSet attr)
+            throws BadLocationException {
+         if (str == null) return;
+      
+         if ((getLength() + str.length()) <= limit) {
+           if (toUppercase) str = str.toUpperCase();
+           super.insertString(offset, str, attr);
+           }
+         }
+      }
+      
 
     public Accueil(Fenetre f) {
         this.fenetre = f;
@@ -72,6 +107,10 @@ public class Accueil extends JPanel{
             unreg();
         });
 
+        refresh.addActionListener((ActionEvent e) -> {
+            refresh();
+        });
+
         games_list.setVisibleRowCount(10);
         games_list.setLayoutOrientation(JList.VERTICAL);
         JScrollPane list = new JScrollPane(games_list);
@@ -84,6 +123,10 @@ public class Accueil extends JPanel{
         rightPane.setLayout(g);
         register.setBorder(BorderFactory.createCompoundBorder());
 
+        
+        id.setDocument(new JTextFieldLimit(8));
+
+        rightPane.add(id);
         rightPane.add(create_game);
         rightPane.add(start);
         rightPane.add(register);
@@ -91,6 +134,7 @@ public class Accueil extends JPanel{
         rightPane.add(size);
         rightPane.add(unregister);
         rightPane.add(info);
+        rightPane.add(refresh);
 
         this.add(rightPane);
 
@@ -103,8 +147,11 @@ public class Accueil extends JPanel{
         //definir le port
         if(!reg){
             try {
-                fenetre.getClient().reqNewPL("Billy_01", 6666);
-                fenetre.getClient().reqGame();
+                int n = 8 - id.getText().length();
+                char[] spaces = new char[n];
+                Arrays.fill(spaces, ' ');
+                fenetre.getClient().reqNewPL(id.getText()+(new String(spaces)), 6666);
+                refresh();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -123,8 +170,11 @@ public class Accueil extends JPanel{
             int m = Integer.parseInt(s[0]);
 
             try {
-                fenetre.getClient().reqRegis("Billy_01", 6666, m);
-                fenetre.getClient().reqGame();
+                int n = 8 - id.getText().length();
+                char[] spaces = new char[n];
+                Arrays.fill(spaces, ' ');
+                fenetre.getClient().reqRegis(id.getText()+(new String(spaces)), 6666,m);
+                refresh();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -167,7 +217,7 @@ public class Accueil extends JPanel{
         if(reg){
             try {
                 fenetre.getClient().reqUnReg();
-                fenetre.getClient().reqGame();
+                refresh();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -176,6 +226,13 @@ public class Accueil extends JPanel{
         }
     }
 
-
+    public void refresh(){
+        try {
+            fenetre.getClient().reqGame();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.info.setText("Nothing for now");
+    }
     
 }

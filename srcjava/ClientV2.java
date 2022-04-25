@@ -9,6 +9,8 @@ public class ClientV2 implements Runnable {
 
     private boolean running = false;
 
+    private boolean first_player = false;
+
     private final static int buff_size = 256;
 
     public Fenetre fe;
@@ -326,7 +328,8 @@ public class ClientV2 implements Runnable {
         System.out.println("Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]);
         count_list = res[8];
 
-        fe.getAccueil().info.setText("Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]);
+        fe.getAccueil().info.setText("Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]+":");
+        first_player = true;
         //send = "";
         //ICI Actualiser l'interface graphique
     }
@@ -339,7 +342,11 @@ public class ClientV2 implements Runnable {
         String nom = new String(res, 6, 8);
         
         String base = fe.getAccueil().info.getText();
-        fe.getAccueil().info.setText(base+":\n"+nom);
+        if(first_player){
+            first_player = false;
+            fe.getAccueil().info.setText(base+" "+nom);
+        }else fe.getAccueil().info.setText(base+", "+nom);
+        
 
         //Ajouter le nom dans une liste
         System.out.println("\t" + nom);

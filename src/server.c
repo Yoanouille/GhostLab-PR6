@@ -131,7 +131,7 @@ void *communication(void *arg){
 
     //Futur full message
     char mess[200];
-    memset(buff, 0, 200);
+    memset(mess, 0, 200);
     int x = 0;
     int pre = 0;
     int prepre = 0;
