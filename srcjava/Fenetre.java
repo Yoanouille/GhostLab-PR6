@@ -14,7 +14,7 @@ public class Fenetre extends JFrame {
 
     public Fenetre(ClientTCP c) {
         super();
-        c.fe = this;
+        c.setFenetre(this);
         this.client = c;
         this.setSize(800, 500);
         this.setVisible(true);

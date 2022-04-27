@@ -144,7 +144,7 @@ public class Accueil extends JPanel{
                 int n = 8 - id.getText().length();
                 char[] spaces = new char[n];
                 Arrays.fill(spaces, ' ');
-                fenetre.getClient().reqNewPL(id.getText()+(new String(spaces)), 6666);
+                fenetre.getClient().reqNewPL(id.getText()+(new String(spaces)));
                 refresh();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -167,7 +167,7 @@ public class Accueil extends JPanel{
                 int n = 8 - id.getText().length();
                 char[] spaces = new char[n];
                 Arrays.fill(spaces, ' ');
-                fenetre.getClient().reqRegis(id.getText()+(new String(spaces)), 6666,m);
+                fenetre.getClient().reqRegis(id.getText()+(new String(spaces)),m);
                 refresh();
             } catch (IOException e) {
                 e.printStackTrace();

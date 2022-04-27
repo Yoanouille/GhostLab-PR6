@@ -5,15 +5,14 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public class ClientTCP implements Runnable {
+
     private Socket socket;
-
     private boolean running = false;
-
     private boolean first_player = false;
-
     private final static int buff_size = 256;
+    private Fenetre fe;
 
-    public Fenetre fe;
+    private ClientUDP cUdp;
 
     //private String send = "GAME?";
     private int count_ogame = 0;
@@ -22,7 +21,13 @@ public class ClientTCP implements Runnable {
 
     public ClientTCP(InetAddress addr, int port) throws IOException {
         socket = new Socket(addr, port);
+        cUdp = new ClientUDP();
+        new Thread(cUdp).start();
         fe = new Fenetre(this);
+    }
+
+    public void setFenetre(Fenetre fe) {
+        this.fe = fe;
     }
 
 
@@ -256,20 +261,20 @@ public class ClientTCP implements Runnable {
     }
 
 
-    public void reqNewPL(String id, int port) throws IOException {
+    public void reqNewPL(String id) throws IOException {
         //send = "NEWPL";
-        byte[] data = ("NEWPL "+id+" "+Integer.toString(port)+"***").getBytes();
+        byte[] data = ("NEWPL "+id+" "+Integer.toString(cUdp.getPort())+"***").getBytes();
         //System.out.println(new String(data, 0, data.length));
         socket.getOutputStream().write(data);
         socket.getOutputStream().flush();
     }
 
-    public void reqRegis(String id, int port, int game) throws IOException {
+    public void reqRegis(String id, int game) throws IOException {
         //send = "REGIS";
         byte[] data = new byte[5 + 1 + 8 + 1 + 4 + 1 + 1 + 3];
         fill(data, 0, "REGIS ");
         fill(data, 5 + 1, id);
-        fill(data, 5 + 1 + 8, " " + Integer.toString(port) + " ");
+        fill(data, 5 + 1 + 8, " " + Integer.toString(cUdp.getPort()) + " ");
         data[5 + 1 + 8 + 1 + 4 + 1] = (byte) game;
         fill(data, 5 + 1 + 8 + 1 + 4 + 1 + 1, "***");
         System.out.println("Send REGIS");
