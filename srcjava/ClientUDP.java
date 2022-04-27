@@ -8,7 +8,9 @@ import java.net.SocketException;
 public class ClientUDP implements Runnable {
     private DatagramSocket socket;
     private boolean isRunning = true;
-    public ClientUDP() {
+    private Fenetre fe;
+    public ClientUDP(Fenetre fe) {
+        this.fe = fe;
         int port = 0;
         boolean good = false;
         while(!good) {

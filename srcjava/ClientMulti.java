@@ -9,8 +9,10 @@ import java.net.MulticastSocket;
 public class ClientMulti implements Runnable {
     private MulticastSocket socket;
     private boolean isRunning = true;
+    private Fenetre fe;
 
-    public ClientMulti(String ip, int port) throws IOException {
+    public ClientMulti(String ip, int port, Fenetre fe) throws IOException {
+        this.fe = fe;
         socket = new MulticastSocket(port);
         socket.joinGroup(InetAddress.getByName(ip));
     }
@@ -98,7 +100,7 @@ public class ClientMulti implements Runnable {
 
         isRunning = false;
         //TODO Afficher le gagnant sur l'IG
-        
+
     }
 
 }

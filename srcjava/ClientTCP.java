@@ -13,6 +13,7 @@ public class ClientTCP implements Runnable {
     private Fenetre fe;
 
     private ClientUDP cUdp;
+    private ClientMulti cMulti;
 
     //private String send = "GAME?";
     private int count_ogame = 0;
@@ -21,9 +22,9 @@ public class ClientTCP implements Runnable {
 
     public ClientTCP(InetAddress addr, int port) throws IOException {
         socket = new Socket(addr, port);
-        cUdp = new ClientUDP();
-        new Thread(cUdp).start();
         fe = new Fenetre(this);
+        cUdp = new ClientUDP(fe);
+        new Thread(cUdp).start();
     }
 
     public void setFenetre(Fenetre fe) {
@@ -505,7 +506,15 @@ public class ClientTCP implements Runnable {
         String ip = new String(res, 15, 15);
         int port = Integer.parseInt(new String(res, 32, 4));
 
-        //TODO: Creer le client Multicast !
+        if(cMulti != null) {
+            try {
+                cMulti = new ClientMulti(ip, port, fe);
+                new Thread(cMulti).start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
         //TODO: Mettre à jour l'interface graphique
     }
 
