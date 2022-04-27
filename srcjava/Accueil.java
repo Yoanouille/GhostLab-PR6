@@ -3,18 +3,12 @@ package srcjava;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.Arrays;
 
 import javax.swing.*;
-import javax.swing.plaf.DimensionUIResource;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
-
-import org.w3c.dom.events.Event;
 
 
 public class Accueil extends JPanel{

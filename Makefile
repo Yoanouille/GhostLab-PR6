@@ -25,7 +25,7 @@ comm.o: src/comm.c include/comm.h include/player.h include/server.h include/game
 ghost.o: src/ghost.c include/lab.h include/ghost.h
 	${CC} ${LDFLAGS} -c src/ghost.c
 
-Main.class: Main.java srcjava/Client.java srcjava/Fenetre.java srcjava/Accueil.java srcjava/ClientV2.java
+Main.class: Main.java srcjava/ClientTCP.java srcjava/Fenetre.java srcjava/Accueil.java
 	javac Main.java
 
 clean: 

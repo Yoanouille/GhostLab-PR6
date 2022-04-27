@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class ClientV2 implements Runnable {
+public class ClientTCP implements Runnable {
     private Socket socket;
 
     private boolean running = false;
@@ -18,8 +18,9 @@ public class ClientV2 implements Runnable {
     //private String send = "GAME?";
     private int count_ogame = 0;
     private int count_list = 0;
+    private int count_glis = 0;
 
-    public ClientV2(InetAddress addr, int port) throws IOException {
+    public ClientTCP(InetAddress addr, int port) throws IOException {
         socket = new Socket(addr, port);
         fe = new Fenetre(this);
     }
@@ -91,6 +92,13 @@ public class ClientV2 implements Runnable {
         }
     }
 
+    public void errorGlis() {
+        if(count_glis != 0) {
+            System.out.println("Error didn't receive the right number of GPLYR");
+            System.exit(1);
+        }
+    }
+
     public void parseReq(byte[] res, int len) {
         String begin = new String(res, 0, 5);
         System.out.println(new String(res,0,len));
@@ -98,6 +106,7 @@ public class ClientV2 implements Runnable {
             case "GAMES" :
                 errorOgame();
                 errorPlayr();
+                errorGlis();
                 // if(!send.equals("GAME?")) {
                 //     System.out.println("Error recv GAMES but not send GAME?");
                 //     System.exit(1);
@@ -111,11 +120,13 @@ public class ClientV2 implements Runnable {
                 //     System.exit(1);
                 // }
                 errorPlayr();
+                errorGlis();
                 resOgame(res, len);
                 break;
             
             case "REGOK" :
                 errorPlayr();
+                errorGlis();
                 errorOgame();
                 // if(!send.equals("NEWPL") && !send.equals("REGIS")) {
                 //     System.out.println("Error recv REGOK but not send NEWPL or REGIS");
@@ -126,6 +137,7 @@ public class ClientV2 implements Runnable {
 
             case "REGNO" :
                 errorPlayr();
+                errorGlis();
                 errorOgame();
                 // if(!send.equals("NEWPL") && !send.equals("REGIS")) {
                 //     System.out.println("Error recv REGOK but not send NEWPL or REGIS");
@@ -136,11 +148,13 @@ public class ClientV2 implements Runnable {
             
             case "UNROK" :
                 errorPlayr();
+                errorGlis();
                 errorOgame();
                 resUnRegOK(res, len);
                 break;
             
             case "DUNNO" :
+                errorGlis();
                 errorPlayr();
                 errorOgame();
                 resDUNNO(res, len);
@@ -148,24 +162,96 @@ public class ClientV2 implements Runnable {
             
             case "SIZE!" :
                 errorPlayr();
+                errorGlis();
                 errorOgame();
                 resSize(res, len);
                 break;
 
             case "LIST!" :
+                errorGlis();
                 errorPlayr();
                 errorOgame();
                 resList(res, len);
                 break;
 
             case "PLAYR" :
+                errorGlis();
                 errorOgame();
                 resPlayr(res, len);
+                break;
+
+            case "WELCO" :
+                errorOgame();
+                errorGlis();
+                errorPlayr();
+                resWelco(res, len);
+                break;
+            
+            case "POSIT" :
+                errorOgame();
+                errorGlis();
+                errorPlayr();
+                resPosit(res, len);
+                break;
+
+            case "MOVE!" :
+                errorOgame();
+                errorGlis();
+                errorPlayr();
+                resMove(res, len);
+                break;
+            
+            case "MOVEF" :
+                errorOgame();
+                errorGlis();
+                errorPlayr();
+                resMoveF(res, len);
+                break;
+                    
+            case "GOBYE" :
+                errorOgame();
+                errorGlis();
+                errorPlayr();
+                resGoodBye(res, len);
+                break;
+
+            case "GLIS!" :
+                errorOgame();
+                errorGlis();
+                errorPlayr();
+                resGlis(res, len);
+                break;
+            
+            case "GPLYR" :
+                errorOgame();
+                errorPlayr();
+                resGplyr(res, len);
+                break;                    
+
+            case "MALL!" :
+                errorOgame();
+                errorGlis();
+                errorPlayr();
+                resMall(res, len);
+                break;
+
+            case "SEND!" :
+                errorOgame();
+                errorGlis();
+                errorPlayr();
+                resSend(res, len);
+                break;
+
+            case "NSEND" :
+                errorOgame();
+                errorGlis();
+                errorPlayr();
+                resNSend(res, len);
                 break;
             
             default :
                 System.out.println("REPONSE INCONNUE");
-                System.exit(1);
+                //System.exit(1);
         }       
     }
 
@@ -234,6 +320,50 @@ public class ClientV2 implements Runnable {
         socket.getOutputStream().write(data);
         socket.getOutputStream().flush();
     }
+
+    //DIR 0 -> UP | 1 -> DOWN | 2 -> LEFT | 3 -> RIGHT
+    public void reqMov(int dir, int len) throws IOException {
+        String mess = "";
+        switch(dir) {
+            case 0: mess = "UPMOV ";break;
+            case 1: mess = "DOMOV ";break;
+            case 2: mess = "LEMOV ";break;
+            case 3: mess = "RIMOV ";break;
+            default: break;
+        }
+        mess += String.format("%03d", len);
+        mess += "***";
+        byte[] data = mess.getBytes();
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+    }
+
+    public void reqQuit() throws IOException {
+        byte[] data = "IQUIT***".getBytes();
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+    }
+
+    public void reqGlis() throws IOException {
+        byte[] data = "GLIS?***".getBytes();
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+    }
+
+    public void reqMall(String mess) throws IOException {
+        String req = "MALL? " + mess + "***";
+        byte[] data = req.getBytes();
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+    }
+
+    public void reqSend(String mess, String id) throws IOException {
+        String req = "SEND? " + id + " " + mess + "***";
+        byte[] data = req.getBytes();
+        socket.getOutputStream().write(data);
+        socket.getOutputStream().flush();
+    }
+
 
     public void resGame(byte[] res, int len) {
         if(len != 10) {
@@ -357,5 +487,123 @@ public class ClientV2 implements Runnable {
         }
     }
 
+    public void resWelco(byte[] res, int len) {
+        if(len != 49) {
+            System.out.println("Error len recv WELCO");
+            System.exit(1);
+        }
+        
+        int num_partie = res[6] & 0xff;
+        int h = ((res[9] & 0xff) << 8) | (res[8] & 0xff);
+        int w = ((res[12] & 0xff) << 8) | (res[11] & 0xff);
+        int nb_fant = res[14] & 0xff;
+        String ip = new String(res, 15, 15);
+        int port = Integer.parseInt(new String(res, 32, 4));
 
+        //TODO: Creer le client Multicast !
+        //TODO: Mettre à jour l'interface graphique
+    }
+
+    public void resPosit(byte[] res, int len) {
+        if(len != 25) {
+            System.out.println("Error len recv POSIT");
+            System.exit(1);
+        }
+
+        String id = new String(res, 6, 8);
+        int x = Integer.parseInt(new String(res, 15, 3));
+        int y = Integer.parseInt(new String(res, 19, 3));
+
+        //TODO: Mettre à jour l'interface graphique
+    }
+
+
+    public void resMove(byte[] res, int len) {
+        if(len != 16) {
+            System.out.println("Error len recv MOVE!");
+            System.exit(1);
+        }
+
+        int x = Integer.parseInt(new String(res, 6, 3));
+        int y = Integer.parseInt(new String(res, 10, 3));
+
+        //TODO: Mettre à jour l'interface graphique
+    }
+
+    public void resMoveF(byte[] res, int len) {
+        if(len != 21) {
+            System.out.println("Error len recv MOVE!");
+            System.exit(1);
+        }
+
+        int x = Integer.parseInt(new String(res, 6, 3));
+        int y = Integer.parseInt(new String(res, 10, 3));
+        int p = Integer.parseInt(new String(res, 14, 4));
+
+        //TODO: Mettre à jour l'interface graphique
+    }
+
+
+    public void resGoodBye(byte[] res, int len) {
+        if(len != 8) {
+            System.out.println("Error len recv GOBYE");
+            System.exit(1);
+        }
+
+        System.out.println("Au revoir !");
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void resGlis(byte[] res, int len) {
+        if(len != 10) {
+            System.out.println("Error len recv GLIS!");
+            System.exit(1);
+        }
+
+        count_glis = res[6];
+        System.out.println("Je vais recevoir " + res[6] + " messages GPLYR");
+    }
+
+    public void resGplyr(byte[] res, int len) {
+        if(len != 30) {
+            System.out.println("Error len recv GPLYR");
+            System.exit(1);
+        }
+
+        count_glis--;
+        String id = new String(res, 6, 8);
+        int x = Integer.parseInt(new String(res,15,3));
+        int y = Integer.parseInt(new String(res,19,3));
+        int p = Integer.parseInt(new String(res,23,4));
+
+        //TODO: Mettre à jour l'interface
+    }
+
+    public void resMall(byte[] res, int len) {
+        if(len != 8) {
+            System.out.println("Error len recv MALL!");
+            System.exit(1);
+        }
+        System.out.println("Message bien envoyé à tous !");
+    }
+
+    public void resSend(byte[] res, int len) {
+        if(len != 8) {
+            System.out.println("Error len recv SEND!");
+            System.exit(1);
+        }
+        System.out.println("Message bien envoyé !");
+    }
+
+    public void resNSend(byte[] res, int len) {
+        if(len != 8) {
+            System.out.println("Error len recv NSEND");
+            System.exit(1);
+        }
+        System.out.println("Message pas bien envoyé !");
+    }
 }

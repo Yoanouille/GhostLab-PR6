@@ -2,19 +2,17 @@ package srcjava;
 
 import javax.swing.*;
 import java.awt.CardLayout;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 
 public class Fenetre extends JFrame {
-    private ClientV2 client;
+    private ClientTCP client;
 
     private JPanel mainPanel;
     private CardLayout cardLayout = new CardLayout();
 
     private Accueil acc;
 
-    public Fenetre(ClientV2 c) {
+    public Fenetre(ClientTCP c) {
         super();
         c.fe = this;
         this.client = c;
@@ -39,7 +37,7 @@ public class Fenetre extends JFrame {
         mainPanel.updateUI();
     }
 
-    public ClientV2 getClient(){
+    public ClientTCP getClient(){
         return client;
     }
 
