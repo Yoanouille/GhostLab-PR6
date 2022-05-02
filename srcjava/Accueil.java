@@ -50,7 +50,7 @@ public class Accueil extends JPanel{
 
     public Boolean reg = false;
 
-    public class JTextFieldLimit extends PlainDocument {
+    private class JTextFieldLimit extends PlainDocument {
         private int limit;
         // optional uppercase conversion
         private boolean toUppercase = false;
@@ -109,6 +109,9 @@ public class Accueil extends JPanel{
 
         refresh.addActionListener((ActionEvent e) -> {
             refresh();
+        });
+        start.addActionListener((ActionEvent e) -> {
+            start();
         });
 
         games_list.setVisibleRowCount(10);
@@ -224,6 +227,19 @@ public class Accueil extends JPanel{
         }else {
             info.setText("You are not registered to any game");
         }
+    }
+
+    public void start(){
+        if(reg){
+            try{
+                fenetre.getClient().reqStart();
+                fenetre.setScene("jeu");
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }else {
+            info.setText("You are not registered to any game");
+        } 
     }
 
     public void refresh(){

@@ -14,20 +14,32 @@ public class Fenetre extends JFrame {
 
     private Accueil acc;
 
+    private EcranAttente attente;
+
+    private MenuPartie jeu;
+
     public Fenetre(ClientV2 c) {
         super();
         c.fe = this;
         this.client = c;
         this.setSize(800, 500);
         this.setVisible(true);
-        this.setResizable(false);
+        // this.setResizable(false);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setAlwaysOnTop(true);
         this.setLocationRelativeTo(null);
 
         mainPanel = new JPanel(cardLayout);
+
         acc = new Accueil(this);
 
+        attente = new EcranAttente(this);
+
+        jeu = new MenuPartie(this);
+
+        mainPanel.add("jeu",jeu);
+
+        mainPanel.add("attente",attente);
         mainPanel.add("accueil", acc);
         this.add(mainPanel);
 
