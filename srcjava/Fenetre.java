@@ -2,12 +2,10 @@ package srcjava;
 
 import javax.swing.*;
 import java.awt.CardLayout;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 
 public class Fenetre extends JFrame {
-    private ClientV2 client;
+    private ClientTCP client;
 
     private JPanel mainPanel;
     private CardLayout cardLayout = new CardLayout();
@@ -18,9 +16,9 @@ public class Fenetre extends JFrame {
 
     private MenuPartie jeu;
 
-    public Fenetre(ClientV2 c) {
+    public Fenetre(ClientTCP c) {
         super();
-        c.fe = this;
+        c.setFenetre(this);
         this.client = c;
         this.setSize(800, 500);
         this.setVisible(true);
@@ -51,7 +49,7 @@ public class Fenetre extends JFrame {
         mainPanel.updateUI();
     }
 
-    public ClientV2 getClient(){
+    public ClientTCP getClient(){
         return client;
     }
 

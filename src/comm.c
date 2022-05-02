@@ -109,6 +109,7 @@ int req_unReg(player *p, game_list **l) {
         if(mySend(p->sock,dunno,8) == -1) return EXIT_FAILURE;
         return EXIT_SUCCESS;
     }
+    int id = g->id;
 
     remove_player_game(g,p->sock);
     if(g->num_player == 0) {
@@ -116,7 +117,8 @@ int req_unReg(player *p, game_list **l) {
     }
     p->his_game = NULL;
     char ok[] = "UNROK m***";
-    ok[6] = g->id;
+    ok[6] = id;
+    printf("UNREG %d***\n", id);
     if(mySend(p->sock,ok,10) == -1) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
@@ -194,8 +196,8 @@ int init_game(game *g) {
     welcome[9] = (g->lab->h)/256;
     welcome[11] = (g->lab->w)%256;
     welcome[12] = (g->lab->w)/256;
-    welcome[14] = 1;
-    snprintf(welcome + 31, 7, "%d***", his_port);    
+    welcome[14] = 5;
+    snprintf(welcome + 32, 7, "%d***", his_port);    
 
     //Initialisation des joueurs
     return init_joueur(g->players, g->lab, welcome);

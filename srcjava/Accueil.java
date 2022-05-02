@@ -3,18 +3,12 @@ package srcjava;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.Arrays;
 
 import javax.swing.*;
-import javax.swing.plaf.DimensionUIResource;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
-
-import org.w3c.dom.events.Event;
 
 
 public class Accueil extends JPanel{
@@ -153,7 +147,7 @@ public class Accueil extends JPanel{
                 int n = 8 - id.getText().length();
                 char[] spaces = new char[n];
                 Arrays.fill(spaces, ' ');
-                fenetre.getClient().reqNewPL(id.getText()+(new String(spaces)), 6666);
+                fenetre.getClient().reqNewPL(id.getText()+(new String(spaces)));
                 refresh();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -176,7 +170,7 @@ public class Accueil extends JPanel{
                 int n = 8 - id.getText().length();
                 char[] spaces = new char[n];
                 Arrays.fill(spaces, ' ');
-                fenetre.getClient().reqRegis(id.getText()+(new String(spaces)), 6666,m);
+                fenetre.getClient().reqRegis(id.getText()+(new String(spaces)),m);
                 refresh();
             } catch (IOException e) {
                 e.printStackTrace();
