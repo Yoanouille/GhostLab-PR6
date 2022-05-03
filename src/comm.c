@@ -197,9 +197,10 @@ int init_game(game *g) {
     welcome[11] = (g->lab->w)%256;
     welcome[12] = (g->lab->w)/256;
     welcome[14] = 5;
-    snprintf(welcome + 32, 7, "%d***", his_port);    
+    snprintf(welcome + 32, 8, "%d***", his_port);    
 
     //Initialisation des joueurs
+    print_lab_2(g->lab);
     return init_joueur(g->players, g->lab, welcome);
 }
 
@@ -288,12 +289,14 @@ int move(char *mess, player *p, game *g, int dir) {
         case 2 :
             dx = -1;
             dy = 0;
+            break;
         case 3 :
             dx = 1;
             dy = 0;
             break;
     }
     for(int i = 0; i < d; i++) {
+        if(p->y + dy < 0 || p->y+dy >= g->lab->h || p->x+dx <0 ||  p->x+dx >= g->lab->w) break;
         if(g->lab->tab[p->y + dy][p->x + dx] == 0) break;
         if(is_on_ghost(g->ghosts, nb_ghost, p->x + dx, p->y + dy)){
             score += 100;

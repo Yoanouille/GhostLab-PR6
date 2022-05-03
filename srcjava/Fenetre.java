@@ -33,15 +33,21 @@ public class Fenetre extends JFrame {
 
         attente = new EcranAttente(this);
 
-        jeu = new MenuPartie(this);
-
-        mainPanel.add("jeu",jeu);
-
         mainPanel.add("attente",attente);
         mainPanel.add("accueil", acc);
         this.add(mainPanel);
 
         setScene("accueil");
+    }
+
+    public void initJeu(int w, int h){
+        jeu = new MenuPartie(this,w,h);
+        mainPanel.add("jeu",jeu);
+        setScene("jeu");
+    }
+
+    public void setPosJoueur(int x,int y){
+        jeu.setJoueur(x,y);
     }
 
     public void setScene(String scene) {

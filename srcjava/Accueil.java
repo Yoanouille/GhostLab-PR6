@@ -227,7 +227,7 @@ public class Accueil extends JPanel{
         if(reg){
             try{
                 fenetre.getClient().reqStart();
-                fenetre.setScene("jeu");
+                fenetre.setScene("attente");
             } catch (IOException e){
                 e.printStackTrace();
             }

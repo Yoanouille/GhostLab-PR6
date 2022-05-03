@@ -494,7 +494,7 @@ public class ClientTCP implements Runnable {
     }
 
     public void resWelco(byte[] res, int len) {
-        if(len != 49) {
+        if(len != 39) {
             System.out.println("Error len recv WELCO");
             System.exit(1);
         }
@@ -515,7 +515,7 @@ public class ClientTCP implements Runnable {
             }
         }
         
-        //TODO: Mettre à jour l'interface graphique
+        fe.initJeu(w,h);
     }
 
     public void resPosit(byte[] res, int len) {
@@ -528,7 +528,7 @@ public class ClientTCP implements Runnable {
         int x = Integer.parseInt(new String(res, 15, 3));
         int y = Integer.parseInt(new String(res, 19, 3));
 
-        //TODO: Mettre à jour l'interface graphique
+        fe.setPosJoueur(x, y);
     }
 
 
@@ -541,7 +541,7 @@ public class ClientTCP implements Runnable {
         int x = Integer.parseInt(new String(res, 6, 3));
         int y = Integer.parseInt(new String(res, 10, 3));
 
-        //TODO: Mettre à jour l'interface graphique
+        fe.setPosJoueur(x,y);
     }
 
     public void resMoveF(byte[] res, int len) {
@@ -554,6 +554,7 @@ public class ClientTCP implements Runnable {
         int y = Integer.parseInt(new String(res, 10, 3));
         int p = Integer.parseInt(new String(res, 14, 4));
 
+        fe.setPosJoueur(x,y);
         //TODO: Mettre à jour l'interface graphique
     }
 

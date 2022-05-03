@@ -65,41 +65,50 @@ int traitement (player *p,char* mess,int* running, int len){
         pthread_mutex_lock(&lock);
         move(mess, p, p->his_game, 0);
         pthread_mutex_unlock(&lock);
+        return EXIT_SUCCESS;
     }
     else if(strncmp(mess, "DOMOV", 5) == 0) {
         pthread_mutex_lock(&lock);
         move(mess, p, p->his_game, 1);
         pthread_mutex_unlock(&lock);
+        return EXIT_SUCCESS;
     }
     else if(strncmp(mess, "LEMOV", 5) == 0) {
         pthread_mutex_lock(&lock);
         move(mess, p, p->his_game, 2);
         pthread_mutex_unlock(&lock);
+        return EXIT_SUCCESS;
     }
     else if(strncmp(mess, "RIMOV", 5) == 0) {
         pthread_mutex_lock(&lock);
         move(mess, p, p->his_game, 3);
         pthread_mutex_unlock(&lock);
+        return EXIT_SUCCESS;
 
     } else if(strncmp(mess, "GLIS?", 5) == 0) {
         pthread_mutex_lock(&lock);
         req_glis(p->his_game, p);
-        return EXIT_SUCCESS;
         pthread_mutex_unlock(&lock);
+        return EXIT_SUCCESS;
+
     } else if(strncmp(mess, "IQUIT", 5) == 0) {
         char message [] = "GOBYE***";
         mySend(p->sock,message,8);
         return EXIT_FAILURE;
+
     } else if (strncmp(mess, "MALL?", 5) == 0){
         char *m = mess + 6;
         len -= 6;
         pthread_mutex_lock(&lock);
         send_mess_all(m, len, p);
         pthread_mutex_unlock(&lock);
+        return EXIT_SUCCESS;
+
     } else if(strncmp(mess, "SEND?", 5) == 0) {
         pthread_mutex_lock(&lock);
         send_mess_perso(mess, len, p);
         pthread_mutex_unlock(&lock);
+        return EXIT_SUCCESS;
     }
     else {
         char message [] = "GOBYE***";
