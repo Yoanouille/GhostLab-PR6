@@ -363,7 +363,7 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
-    public void reqSend(String mess, String id) throws IOException {
+    public void reqSend(String id, String mess) throws IOException {
         String req = "SEND? " + id + " " + mess + "***";
         byte[] data = req.getBytes();
         socket.getOutputStream().write(data);
@@ -581,6 +581,7 @@ public class ClientTCP implements Runnable {
 
         count_glis = res[6];
         System.out.println("Je vais recevoir " + res[6] + " messages GPLYR");
+        fe.reset_players();
     }
 
     public void resGplyr(byte[] res, int len) {
@@ -596,6 +597,7 @@ public class ClientTCP implements Runnable {
         int p = Integer.parseInt(new String(res,23,4));
 
         //TODO: Mettre à jour l'interface
+        fe.add_player(id,p);
     }
 
     public void resMall(byte[] res, int len) {
