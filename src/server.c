@@ -12,7 +12,7 @@ void *ghost_thread(void *arg) {
     game *g = (game *)arg;
 
     while(1) {
-        sleep(10);
+        sleep(100);
         printf("coucou\n");
         pthread_mutex_lock(&lock);
         if(g == NULL || g->bool_started == 0 || all_catched(g->ghosts, nb_ghost)) {
@@ -282,6 +282,9 @@ int main(int argc, char const *argv[]){
             perror("accept");
             return EXIT_FAILURE;
         }
+        
+        printf("ip : %s\n", inet_ntoa(caller.sin_addr));
+
         player *p = genPlayer(sock_client,caller, 0, 0, "NULLNULL");
         //One thread per client
         pthread_t th;

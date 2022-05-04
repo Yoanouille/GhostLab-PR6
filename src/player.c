@@ -9,6 +9,7 @@ player *genPlayer(int sock, struct sockaddr_in addr, int x, int y, char *id){
         exit(1);
     }
     p->sock = sock;
+
     p->addr = addr;
     p->x = x;
     p->y = y;

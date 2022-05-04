@@ -503,11 +503,14 @@ public class ClientTCP implements Runnable {
         int h = ((res[9] & 0xff) << 8) | (res[8] & 0xff);
         int w = ((res[12] & 0xff) << 8) | (res[11] & 0xff);
         int nb_fant = res[14] & 0xff;
-        String ip = new String(res, 15, 15);
+        String ip = new String(res, 16, 15);
         int port = Integer.parseInt(new String(res, 32, 4));
 
-        if(cMulti != null) {
+
+
+        if(cMulti == null) {
             try {
+                System.out.println("Je lance MULTI");
                 cMulti = new ClientMulti(ip, port, fe);
                 new Thread(cMulti).start();
             } catch (IOException e) {

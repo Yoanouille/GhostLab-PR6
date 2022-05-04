@@ -14,21 +14,32 @@ public class ClientMulti implements Runnable {
     public ClientMulti(String ip, int port, Fenetre fe) throws IOException {
         this.fe = fe;
         socket = new MulticastSocket(port);
-        socket.joinGroup(InetAddress.getByName(ip));
+        System.out.println(port);
+        System.out.println(ip);
+        String newIp = "";
+        for(int i = 0; i < ip.length(); i++) {
+            if(ip.charAt(i) != '#') newIp += ip.substring(i, i+1);
+            else break;
+        }
+        System.out.println(newIp);
+        socket.joinGroup(InetAddress.getByName(newIp));
     }
 
     @Override
     public void run() {
         while(isRunning) {
+            System.out.println("COUCOU MULTI");
             byte[] data = new byte[256];
             DatagramPacket packet = new DatagramPacket(data, data.length);
             try {
                 socket.receive(packet);
+                parseMess(packet);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }        
+        }     
+        System.out.println("FIN MULTI");   
     }
 
     public void parseMess(DatagramPacket packet) {
@@ -40,6 +51,7 @@ public class ClientMulti implements Runnable {
             System.out.println("Error +++ packet !");
             return;
         }
+        System.out.println(mess);
         switch(debut) {
             case "GHOST" :
                 resGhost(res, len);

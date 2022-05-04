@@ -187,6 +187,7 @@ int init_game(game *g) {
         exit(EXIT_FAILURE);
     }
 
+    g->sock_udp  = sock;
     init_ghost(g->ghosts, nb_ghost, g->lab);
 
     //Initialisation Welcome
@@ -346,13 +347,14 @@ int send_mess_all(char *mess, int len, player *p) {
     copy[len] = 0;
     printf("MESS : %s\n", copy);
 
-    char res[18 + len];
+    char res[18 + len + 1];
     memcpy(res, "MESSA ", 6);
     memcpy(res + 6, p->id, 8);
     res[14] = ' ';
     memcpy(res + 15, mess, len);
     memcpy(res + 15 + len, "+++", 3);
 
+    res[len + 18] = 0;
     printf("REPONSE MALL : %s\n", res);
  
     int r = sendto(p->his_game->sock_udp, res, 18 + len, 0, (struct sockaddr *)&p->his_game->addr, sizeof(struct sockaddr_in));
@@ -370,25 +372,37 @@ int send_mess_perso(char *req, int len, player *p) {
     id[8] = 0;
     printf("Il faut envoyé à : %s\n", id);
 
-    char *mess = req + 15;
-    len -= 18;
+    for(int i = 0; i < len; i++) {
+        printf("%c", req[i]);
+    }
+    printf(" End\n");
 
-    if(get_player(p->his_game->players, id) == NULL) {
+    char *mess = req + 15;
+    len -= 15;
+
+    for(int i =0; i< len; i++) {
+        printf("%c",mess[i]);
+    }
+    printf(" End\n");
+
+    player *p_to = get_player(p->his_game->players, id);
+    if(p_to == NULL) {
         char rep[] = "NSEND***";
         if(mySend(p->sock, rep, 8) == -1) return EXIT_FAILURE;
         return EXIT_SUCCESS;
     }
 
-    char res[18 + len];
+    char res[18 + len + 1];
     memcpy(res, "MESSP ", 6);
     memcpy(res + 6, p->id, 8);
     res[14] = ' ';
     memcpy(res + 15, mess, len);
     memcpy(res + 15 + len, "+++", 3);
+    res[len + 18] = 0;
 
     printf("REPONSE MESSP : %s\n", res);
 
-    int r = sendto(p->his_game->sock_udp, res, 18 + len, 0, (struct sockaddr *)&p->his_game->addr, sizeof(struct sockaddr_in));
+    int r = sendto(p->his_game->sock_udp, res, 18 + len, 0, (struct sockaddr *)&p_to->addr, sizeof(struct sockaddr_in));
     if(r == -1) return EXIT_FAILURE;
 
     char rep[] = "SEND!***";

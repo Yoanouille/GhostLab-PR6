@@ -32,16 +32,19 @@ public class ClientUDP implements Runnable {
     @Override
     public void run() {
         while(isRunning) {
+            System.out.println("UDP");
             byte[] data = new byte[256];
             DatagramPacket packet = new DatagramPacket(data, data.length);
             try {
                 socket.receive(packet);
+                parseMess(packet);
 
             } catch (IOException e) {
                 System.out.println("End UDP");
             }
             if(socket.isClosed()) break;
         }
+        System.out.println("FIN UDP");
     }
 
     public void parseMess(DatagramPacket packet) {
@@ -53,6 +56,7 @@ public class ClientUDP implements Runnable {
             System.out.println("Error +++ UDP");
             return;
         }
+        System.out.println(mess);
         switch(debut) {
             case "MESSP" :
                 resMessp(res, len);
