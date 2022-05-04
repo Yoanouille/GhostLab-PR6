@@ -2,6 +2,8 @@ package srcjava;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.io.IOException;
+
 
 import javax.swing.plaf.DimensionUIResource;
 import javax.swing.text.AttributeSet;
@@ -14,16 +16,21 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.BoxLayout;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.LinkedList;
-
+import java.awt.*;
+import javax.swing.*;
 
 
 public class MenuPartie extends JPanel{
 
     private LinkedList<Integer> queueMovelen = new LinkedList<Integer>();
     private LinkedList<Integer> queueMoveDir = new LinkedList<Integer>();
+    
+    public DefaultListModel<String> players = new DefaultListModel<String>();
+    private JList<String> player_list = new JList<String>(players);
+    
+    
     private Fenetre fenetre;
 
     private PanneauJeu plateau = new PanneauJeu();
@@ -33,37 +40,9 @@ public class MenuPartie extends JPanel{
     private int x = -1;
     private int y = -1;
 
-    private class JTextFieldLimit extends PlainDocument {
-        private int limit;
-        // optional uppercase conversion
-        private boolean toUppercase = false;
-        
-        JTextFieldLimit(int limit) {
-         super();
-         this.limit = limit;
-         }
-         
-        JTextFieldLimit(int limit, boolean upper) {
-         super();
-         this.limit = limit;
-         toUppercase = upper;
-         }
-       
-        public void insertString
-          (int offset, String  str, AttributeSet attr)
-            throws BadLocationException {
-         if (str == null) return;
-      
-         if ((getLength() + str.length()) <= limit) {
-           if (toUppercase) str = str.toUpperCase();
-                super.insertString(offset, str, attr);
-           }
-        }
-    }
-
-
 
     public MenuPartie(Fenetre fe,int width, int height){
+        this.fenetre = fe;
         data = new int[width] [height];
         GridLayout gridLayout = new GridLayout(1,2);
 
@@ -78,28 +57,31 @@ public class MenuPartie extends JPanel{
                 data[i][j]=0;
             }
         }
-        JTextField message = new JTextField();
 
-        message.setDocument(new JTextFieldLimit(200));
-        rightPane.add(message,BorderLayout.NORTH);
+        //DIRECTION------------------------------------------------------------
 
         JPanel cross = new JPanel();
         cross.setAlignmentY(Component.CENTER_ALIGNMENT);
         cross.setLayout(new BoxLayout(cross,BoxLayout.Y_AXIS));
+
 
         JPanel d_cross = new JPanel();
         d_cross.setLayout(new BoxLayout(d_cross,BoxLayout.X_AXIS));
 
         JButton up = new JButton("\u2191");
         up.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         JButton down = new JButton("\u2193");
         down.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+
         JButton right = new JButton("\u2192");
         JButton left = new JButton("\u2190");
-        
+
         JLabel nextMove = new JLabel(" ");
         nextMove.setAlignmentX(Component.CENTER_ALIGNMENT);
        
+
         JButton move = new JButton("Move");
         move.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -116,36 +98,7 @@ public class MenuPartie extends JPanel{
             nextMove("\u2190",nextMove);
         });
 
-        move.addActionListener((ActionEvent e) -> {
-            int dir;
-            switch (nextMove.getText().charAt(0)) {
-                case '\u2191':
-                    dir = 0;
-                    break;
-                case '\u2193':
-                    dir = 1;
-                    break;
-                case '\u2190':
-                    dir = 2;
-                    break;
-                case '\u2192':
-                    dir = 3;
-                    break;
-            
-                default:
-                    dir = -1;
-                    break;
-            }
-            if(dir != -1){
-                try {
-                    queueMovelen.push(nextMove.getText().length());
-                    queueMoveDir.push(dir);
-                    fe.getClient().reqMov(dir,nextMove.getText().length());  
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }      
-        });
+        move.addActionListener((ActionEvent e) -> move(nextMove));
 
         d_cross.add(left);
         d_cross.add(down);
@@ -155,10 +108,48 @@ public class MenuPartie extends JPanel{
         cross.add(d_cross);
         cross.add(nextMove);
         cross.add(move);
-
-
-
         rightPane.add(cross,BorderLayout.CENTER);
+
+
+        //CHAT-----------------------------------------------------------------
+
+        JPanel chatMenu = new JPanel();
+        chatMenu.setLayout(new BoxLayout(chatMenu,BoxLayout.Y_AXIS));
+
+        JScrollPane list = new JScrollPane(player_list);
+
+        JButton actu = new JButton("actualiser");
+        actu.addActionListener((ActionEvent e) -> refresh());
+        actu.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JTextField message = new JTextField();
+
+        message.setDocument(new JTextFieldLimit(200));
+        message.setAutoscrolls(true);
+        
+        
+        JButton send_to = new JButton("Send to :");
+        send_to.setAlignmentX(Component.CENTER_ALIGNMENT);
+        send_to.addActionListener((ActionEvent e) -> send_to_player(message));
+
+        JButton send_all = new JButton("Send to all");
+        send_all.setAlignmentX(Component.CENTER_ALIGNMENT);
+        send_all.addActionListener((ActionEvent e) -> send_to_all(message));
+
+        JPanel buttons_send = new JPanel();
+        buttons_send.setLayout(new BoxLayout(buttons_send,BoxLayout.X_AXIS));
+        buttons_send.add(send_all);
+        buttons_send.add(send_to);
+        chatMenu.add(actu);
+        chatMenu.add(list);
+        chatMenu.add(message);
+        chatMenu.add(buttons_send);
+
+        rightPane.add(chatMenu,BorderLayout.NORTH);
+
+
+
+        
 
         
 
@@ -166,20 +157,52 @@ public class MenuPartie extends JPanel{
         this.add(rightPane);
 
         this.setVisible(true);
+        System.out.println(actu.getWidth());
+        System.out.println(actu.getParent());    
+        System.out.println(actu.getParent().getParent().getWidth());
+
+
         this.updateUI();
-        // actualisation
-        // new Thread (() -> {
-        //     while(true){
-        //         plateau.repaint();
-        //         try {
-        //             Thread.sleep(1000/30);
-        //         } catch (Exception e) {
-        //             e.printStackTrace();
-        //         }
+        /*actualisation
+        new Thread (() -> {
+            while(true){
+                plateau.repaint();
+                try {
+                    Thread.sleep(1000/30);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 
 
-        //     }
-        // }).start();;
+            }
+        }).start();;*/
+    }
+    private void send_to_player(JTextField text){
+        if(player_list.getSelectedValue() != null){
+            String g = player_list.getSelectedValue();
+            String id = g.substring(0,8);
+            try {
+                fenetre.getClient().reqSend(id,text.getText());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void send_to_all(JTextField text){
+        try {
+            fenetre.getClient().reqMall(text.getText());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void refresh(){
+        try {
+            fenetre.getClient().reqGlis();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void nextMove(String s,JLabel label){
@@ -190,6 +213,39 @@ public class MenuPartie extends JPanel{
         }
         
     }
+    
+    private void move(JLabel nextMove){
+        int dir;
+        switch (nextMove.getText().charAt(0)) {
+            case '\u2191':
+                dir = 0;
+                break;
+            case '\u2193':
+                dir = 1;
+                break;
+            case '\u2190':
+                dir = 2;
+                break;
+            case '\u2192':
+                dir = 3;
+                break;
+        
+            default:
+                dir = -1;
+                break;
+        }
+        if(dir != -1){
+            try {
+                queueMovelen.push(nextMove.getText().length());
+                queueMoveDir.push(dir);
+                fenetre.getClient().reqMov(dir,nextMove.getText().length());  
+                nextMove.setText(nextMove.getText().substring(0,1));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }      
+    }
+
     public void setJoueur(int x, int y){
         if(this.x == -1 && this.y == -1){
             data[x][y] = 1;
@@ -230,8 +286,11 @@ public class MenuPartie extends JPanel{
         this.y = y;
         plateau.repaint();
      }
+    
+
 
     private class PanneauJeu extends JPanel {
+    
         
         public PanneauJeu() {
             super();
@@ -278,9 +337,33 @@ public class MenuPartie extends JPanel{
                 height / data[x].length -2);
             }
         }
-        
-
 
     }
-    
+    private class JTextFieldLimit extends PlainDocument {
+        private int limit;
+        // optional uppercase conversion
+        private boolean toUppercase = false;
+        
+        JTextFieldLimit(int limit) {
+         super();
+         this.limit = limit;
+         }
+         
+        JTextFieldLimit(int limit, boolean upper) {
+         super();
+         this.limit = limit;
+         toUppercase = upper;
+         }
+       
+        public void insertString
+          (int offset, String  str, AttributeSet attr)
+            throws BadLocationException {
+         if (str == null) return;
+      
+         if ((getLength() + str.length()) <= limit && !str.contains("*") && !str.contains("+")) {
+           if (toUppercase) str = str.toUpperCase();
+                super.insertString(offset, str, attr);
+           }
+        }
+    }
 }

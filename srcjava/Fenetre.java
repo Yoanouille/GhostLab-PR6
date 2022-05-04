@@ -2,6 +2,7 @@ package srcjava;
 
 import javax.swing.*;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 
 public class Fenetre extends JFrame {
@@ -21,10 +22,12 @@ public class Fenetre extends JFrame {
         c.setFenetre(this);
         this.client = c;
         this.setSize(800, 500);
+        this.setTitle("Ghost Lab");
         this.setVisible(true);
         // this.setResizable(false);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setAlwaysOnTop(true);
+        this.setAlwaysOnTop(false);
+        this.setMinimumSize(new Dimension(500,300));
         this.setLocationRelativeTo(null);
 
         mainPanel = new JPanel(cardLayout);
@@ -76,6 +79,30 @@ public class Fenetre extends JFrame {
         Runnable run=new Runnable(){
             public void run(){
                 acc.games.addElement("Partie " + ngame + " : " + nplayer + " joueur(s)");
+            }
+        };
+        try {
+            SwingUtilities.invokeAndWait(run);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void reset_players(){
+        Runnable run=new Runnable(){
+            public void run(){
+                jeu.players.clear();
+            }
+        };
+        SwingUtilities.invokeLater(run);
+    }
+
+    public void add_player(String id, int score){
+        Runnable run=new Runnable(){
+            public void run(){
+                jeu.players.addElement(id + " points: " + score);
             }
         };
         try {

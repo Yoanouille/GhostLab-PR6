@@ -65,7 +65,7 @@ public class Accueil extends JPanel{
             throws BadLocationException {
          if (str == null) return;
       
-         if ((getLength() + str.length()) <= limit) {
+         if ((getLength() + str.length()) <= limit && isAlphaNum(str)) {
            if (toUppercase) str = str.toUpperCase();
            super.insertString(offset, str, attr);
            }
@@ -243,6 +243,17 @@ public class Accueil extends JPanel{
             e.printStackTrace();
         }
         this.info.setText("Nothing for now");
+    }
+
+    public static boolean isAlphaNum(String str) {
+        str = str.toLowerCase();
+        for (int i = 0; i < str.length(); ++i) {
+            char alpha = str.charAt(i);
+            if (!((alpha >= 'a' && alpha <= 'z') || (alpha >= '0' && alpha <= '9'))) {
+                return false;
+            }
+        }
+        return true;
     }
     
 }

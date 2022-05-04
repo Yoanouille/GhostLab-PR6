@@ -83,6 +83,7 @@ public class ClientMulti implements Runnable {
         String id = new String(res, 6, 8);
         String mess = new String(res, 15, len - 15);
         mess = mess.substring(0, mess.length() - 3);
+        System.out.println(id +": "+mess);
 
         //TODO: Mettre à jour l'interface
     }
