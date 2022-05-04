@@ -1,5 +1,12 @@
 #include "ghost.h"
 
+void init_ghost(ghost *g, int len, lab *l) {
+    place_ghost(g, len, l);
+    for(int i = 0; i < len; i++) {
+        g[i].catched = 0;
+    }
+}
+
 void place_ghost(ghost *g, int len, lab *l) {
     for(int i = 0; i < len; i++) {
         int x = 0;
@@ -10,7 +17,6 @@ void place_ghost(ghost *g, int len, lab *l) {
         } while(l->tab[y][x] == 0);
         g[i].x = x;
         g[i].y = y;
-        g[i].catched = 0;
     }
 }
 

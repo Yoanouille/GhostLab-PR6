@@ -11,6 +11,7 @@
 #include <string.h>
 #include <endian.h>
 #include <sys/select.h>
+#include <signal.h>
 
 #include "game.h"
 #include "player.h"

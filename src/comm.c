@@ -187,7 +187,7 @@ int init_game(game *g) {
         exit(EXIT_FAILURE);
     }
 
-    place_ghost(g->ghosts, nb_ghost, g->lab);
+    init_ghost(g->ghosts, nb_ghost, g->lab);
 
     //Initialisation Welcome
     char welcome[] = "WELCO m hh ww f 225.1.2.4###### port***";
@@ -196,7 +196,7 @@ int init_game(game *g) {
     welcome[9] = (g->lab->h)/256;
     welcome[11] = (g->lab->w)%256;
     welcome[12] = (g->lab->w)/256;
-    welcome[14] = 5;
+    welcome[14] = nb_ghost;
     snprintf(welcome + 32, 8, "%d***", his_port);    
 
     //Initialisation des joueurs

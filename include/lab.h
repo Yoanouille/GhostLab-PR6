@@ -13,6 +13,7 @@ typedef struct lab
 lab *build_lab(int w, int h);
 void destroy_lab(lab *l);
 void print_lab(lab *l);
+void print_lab_2(lab *l);
 void gen_lab(lab *l);
 
 

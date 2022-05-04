@@ -15,6 +15,8 @@ game *gen_game(int w, int h) {
     g->num_player = 0;
     g->bool_started = 0;
     g->sock_udp = 0;
+    g->thread_g = NULL;
+    //g->fd_event = eventfd()
 
     return g;
 }

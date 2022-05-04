@@ -7,6 +7,32 @@ pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 //Function used on one message
 
+
+void *ghost_thread(void *arg) {
+    game *g = (game *)arg;
+
+    while(1) {
+        sleep(10);
+        printf("coucou\n");
+        pthread_mutex_lock(&lock);
+        if(g == NULL || g->bool_started == 0 || all_catched(g->ghosts, nb_ghost)) {
+            printf("Fin thread fantome\n");
+            pthread_mutex_unlock(&lock);
+            break;
+        }
+        place_ghost(g->ghosts, nb_ghost, g->lab);
+        for(int i = 0; i < nb_ghost; i++) {
+            if(!g->ghosts[i].catched) {
+                printf("J'envoie ghost !\n");
+                send_ghost(g, g->ghosts[i].x, g->ghosts[i].y);
+            }
+        }
+        pthread_mutex_unlock(&lock);
+    }
+
+    return NULL;
+}
+
 int traitement (player *p,char* mess,int* running, int len){
     printf("%s\n", mess);
     if(strncmp(mess,"NEWPL",5) == 0){
@@ -52,7 +78,15 @@ int traitement (player *p,char* mess,int* running, int len){
         if(p->his_game != NULL) {
             if(all_started(p->his_game->players)) {
                 //Init la game
+                p->his_game->bool_started = 1;
                 init_game(p->his_game);
+                pthread_t *thread_ghost = malloc(sizeof(pthread_t));
+                if(thread_ghost == NULL) {
+                    perror("malloc pthread ghost");
+                    exit(1);
+                }
+                pthread_create(thread_ghost,NULL,ghost_thread,p->his_game);
+                p->his_game->thread_g = thread_ghost;
                 //Lancer un Thread pour la game !
                 pthread_mutex_unlock(&lock);
             } else {  
@@ -185,9 +219,23 @@ void *communication(void *arg){
 
     pthread_mutex_lock(&lock);
     if(p->his_game != NULL) {
+        printf("num player : %d\n", p->his_game->num_player);
+        printf("Je remove le player de la game !\n");
         remove_player_game(p->his_game, p->sock);
+        printf("num player : %d\n", p->his_game->num_player);
         if(p->his_game->num_player == 0) {
+            //Attendre le thread si il continue
+            printf("TRY GAME REMOVED !\n");
+            pthread_mutex_unlock(&lock);
+            
+            if(p->his_game->thread_g != NULL) {
+                p->his_game->bool_started = 0;
+                pthread_join(*(p->his_game->thread_g), NULL);
+                free(p->his_game->thread_g);
+            }
+            pthread_mutex_lock(&lock);
             g_list = remove_game(g_list, p->his_game->id);
+            printf("GAME REMOVED !\n");
         }
     }
     pthread_mutex_unlock(&lock);

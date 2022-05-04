@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 #include <endian.h>
+#include <pthread.h>
+#include <sys/eventfd.h>
 #include "player.h"
 #include "lab.h"
 #include "ghost.h"
@@ -19,6 +21,8 @@ typedef struct game {
     int sock_udp;
     struct sockaddr_in addr;
     ghost ghosts[nb_ghost];
+    int fd_event;
+    pthread_t *thread_g;
  
 } game;
 
