@@ -600,6 +600,7 @@ public class ClientTCP implements Runnable {
         int p = Integer.parseInt(new String(res,23,4));
 
         //TODO: Mettre à jour l'interface
+        fe.drawPlayers(x, y);
         fe.add_player(id,p);
     }
 

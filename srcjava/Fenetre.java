@@ -114,4 +114,12 @@ public class Fenetre extends JFrame {
         }
     }
 
+    public void drawGhost(int x, int y) {
+        jeu.addPosToDraw(x, y, "ghost");
+    }
+
+    public void drawPlayers(int x, int y) {
+        jeu.addPosToDraw(x, y, "player");
+    }
+
 }

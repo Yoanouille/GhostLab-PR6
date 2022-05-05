@@ -18,10 +18,10 @@ typedef struct game {
     player_list *players;
     lab *lab;
     int bool_started;
+    int finished;
     int sock_udp;
     struct sockaddr_in addr;
     ghost ghosts[nb_ghost];
-    int fd_event;
     pthread_t *thread_g;
  
 } game;
@@ -48,5 +48,8 @@ game *get_game(game_list *l, int id);
 //game *get_player_game(game_list *l,player *p);
 int size_list_game(game_list *l);
 int size_list_game_active(game_list *l);
+
+void print_game(game *g);
+void print_list_game(game_list *g);
 
 #endif

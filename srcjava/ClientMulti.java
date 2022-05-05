@@ -3,7 +3,6 @@ package srcjava;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 
 public class ClientMulti implements Runnable {
@@ -75,7 +74,7 @@ public class ClientMulti implements Runnable {
         int x = Integer.parseInt(new String(res, 6, 3));
         int y = Integer.parseInt(new String(res, 10, 3));
 
-        //TODO: Mettre à jour l'interface
+        fe.drawGhost(x, y);
     }
 
     public void resScore(byte[] res, int len) {

@@ -1,6 +1,6 @@
 #include "server.h"
 
-game_list* g_list;
+game_list* g_list = NULL;
 
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -12,10 +12,10 @@ void *ghost_thread(void *arg) {
     game *g = (game *)arg;
 
     while(1) {
-        sleep(100);
+        sleep(10);
         printf("coucou\n");
         pthread_mutex_lock(&lock);
-        if(g == NULL || g->bool_started == 0 || all_catched(g->ghosts, nb_ghost)) {
+        if(g == NULL || g->finished || all_catched(g->ghosts, nb_ghost)) {
             printf("Fin thread fantome\n");
             pthread_mutex_unlock(&lock);
             break;
@@ -181,7 +181,6 @@ void *communication(void *arg){
     int running = 1;
     while(running) {
         int re = recv(p->sock, buff, SIZE,0);
-        //printf("%d\n", re);
         if(re ==-1){
             perror("recv");
             break;
@@ -229,7 +228,7 @@ void *communication(void *arg){
             pthread_mutex_unlock(&lock);
             
             if(p->his_game->thread_g != NULL) {
-                p->his_game->bool_started = 0;
+                p->his_game->finished = 1;
                 pthread_join(*(p->his_game->thread_g), NULL);
                 free(p->his_game->thread_g);
             }

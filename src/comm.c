@@ -28,15 +28,17 @@ void send_ogame(game_list *l, char *mess) {
         mess_bis[6] = l->g->id;
         mess_bis[8] = l->g->num_player;
         memcpy(mess, mess_bis, 12);
-    }
-    send_ogame(l->next, mess + 12);
+        send_ogame(l->next, mess + 12);
+    } else send_ogame(l->next, mess);
 }
 
 
 int send_game(int sock, game_list *l) {
+    print_list_game(l);
     uint8_t nb_game = size_list_game_active(l);
     char mess[10 + nb_game * 12];
     memset(mess, 0, 10 + nb_game * 12);
+
 
     memcpy(mess, "GAMES n***", 10);
 

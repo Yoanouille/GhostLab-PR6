@@ -4,19 +4,16 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.io.IOException;
 
-
-import javax.swing.plaf.DimensionUIResource;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 import javax.swing.BoxLayout;
 import java.awt.event.ActionEvent;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.awt.*;
 import javax.swing.*;
@@ -29,6 +26,8 @@ public class MenuPartie extends JPanel{
     
     public DefaultListModel<String> players = new DefaultListModel<String>();
     private JList<String> player_list = new JList<String>(players);
+
+    private HashSet<PosOp> setOfDraw = new HashSet<>();
     
     
     private Fenetre fenetre;
@@ -163,10 +162,12 @@ public class MenuPartie extends JPanel{
 
 
         this.updateUI();
-        /*actualisation
         new Thread (() -> {
             while(true){
-                plateau.repaint();
+                SwingUtilities.invokeLater(() -> {
+                    plateau.repaint();
+                    Toolkit.getDefaultToolkit().sync();
+                });
                 try {
                     Thread.sleep(1000/30);
                 } catch (Exception e) {
@@ -175,8 +176,21 @@ public class MenuPartie extends JPanel{
                 
 
             }
-        }).start();;*/
+        }).start();;
     }
+
+    public void addPosToDraw(int x, int y, String type) {
+        synchronized(setOfDraw) {
+            if(type.equals("ghost")) {
+                PosOp p = new PosOp(x, y, Color.GREEN);
+                setOfDraw.add(p);
+            } else if(type.equals("player")) {
+                PosOp p = new PosOp(x, y, Color.RED);
+                setOfDraw.add(p);
+            }
+        }
+    }
+
     private void send_to_player(JTextField text){
         if(player_list.getSelectedValue() != null){
             String g = player_list.getSelectedValue();
@@ -284,7 +298,7 @@ public class MenuPartie extends JPanel{
         }
         this.x = x;
         this.y = y;
-        plateau.repaint();
+        //plateau.repaint();
      }
     
 
@@ -335,6 +349,21 @@ public class MenuPartie extends JPanel{
                 g.setColor(Color.BLUE);
                 g.fillRect(x * width / data.length + 1, y * height / data[x].length + 1, width / data.length -2,
                 height / data[x].length -2);
+            }
+
+
+            synchronized(setOfDraw) {
+                LinkedList<PosOp> elt_rm = new LinkedList<>();
+                for(PosOp p : setOfDraw) {
+                    Color c = p.getC();
+                    g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), p.getOpacity()));
+                    g.fillRect(p.getX() * width / data.length + 3, p.getY() *  height / data[p.getX()].length + 3 , width / data.length - 6, height / data[x].length - 6);
+                    if(p.reduceOp()) elt_rm.add(p);
+
+                }
+                for(PosOp elt : elt_rm) {
+                    setOfDraw.remove(elt);
+                }
             }
         }
 

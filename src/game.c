@@ -14,6 +14,7 @@ game *gen_game(int w, int h) {
     g->id = 0;
     g->num_player = 0;
     g->bool_started = 0;
+    g->finished = 0;
     g->sock_udp = 0;
     g->thread_g = NULL;
     //g->fd_event = eventfd()
@@ -117,5 +118,19 @@ int size_list_game(game_list *l) {
 }
 int size_list_game_active(game_list *l) {
     if(l == NULL) return 0;
-    else return (l->g->bool_started ? 0 : 1) + size_list_game(l->next);   
+    else return (l->g->bool_started ? 0 : 1) + size_list_game_active(l->next);   
+}
+
+
+void print_game(game *g) {
+    printf("ID : %d, SOCKUDP : %d, NUM_PLAYER : %d, STARTED: %d\n", g->id, g->sock_udp,g->num_player,g->bool_started);
+}
+
+void print_list_game(game_list *g) {
+    if(g == NULL) {
+        printf("\n");
+        return;
+    }
+    print_game(g->g);
+    print_list_game(g->next);
 }
