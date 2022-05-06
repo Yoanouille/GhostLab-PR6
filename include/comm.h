@@ -17,7 +17,7 @@ int req_Size(player *p, char *mess, game_list *l);
 int req_List(player *p, char *mess, game_list *l);
 
 int init_game(game *g);
-int init_joueur(player_list *p, lab *l, char *welcome);
+int init_joueur(player_list *p, lab *l, ghost *g,char *welcome);
 int send_ghost(game *g, int x, int y);
 player *get_winner(player_list *p, player *best_p);
 int move(char *mess, player *p, game *g, int dir);

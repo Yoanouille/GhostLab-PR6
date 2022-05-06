@@ -15,6 +15,6 @@ void destroy_lab(lab *l);
 void print_lab(lab *l);
 void print_lab_2(lab *l);
 void gen_lab(lab *l);
-
+void gen_piege(lab *l, int nb_piege);
 
 #endif

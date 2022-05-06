@@ -57,7 +57,7 @@ int req_newPl(player *p, char *mess, game_list **l) {
     memcpy(p->id, mess+6,8);
     p->id[8] = '\0';
     //printf("ID : %s\n", p->id);
-    game *g = gen_game(WIDTH,HEIGHT);
+    game *g = gen_game(10,10);
     add_player_game(g,p);
     p->his_game = g;
     *l = add_game(*l,g);
@@ -190,7 +190,7 @@ int init_game(game *g) {
     }
 
     g->sock_udp  = sock;
-    init_ghost(g->ghosts, nb_ghost, g->lab);
+    init_ghost(g->ghosts, nb_ghost, g->lab, g->players);
 
     //Initialisation Welcome
     char welcome[] = "WELCO m hh ww f 225.1.2.4###### port***";
@@ -204,17 +204,17 @@ int init_game(game *g) {
 
     //Initialisation des joueurs
     print_lab_2(g->lab);
-    return init_joueur(g->players, g->lab, welcome);
+    return init_joueur(g->players, g->lab, g->ghosts,welcome);
 }
 
-int init_joueur(player_list *p, lab *l, char *welcome) {
+int init_joueur(player_list *p, lab *l, ghost *g,char *welcome) {
     if(p == NULL) return EXIT_SUCCESS;
     int x = 0;
     int y = 0;
     do {
         x = rand() % (l->w);
         y = rand() % (l->h);
-    } while(l->tab[y][x] == 0);
+    } while(l->tab[y][x] == 0 || is_on_ghost_not_catched(g, nb_ghost, x, y));
 
     p->p->x = x;
     p->p->y = y;
@@ -224,7 +224,7 @@ int init_joueur(player_list *p, lab *l, char *welcome) {
     char mess[42];
     snprintf(mess, 42, "POSIT %s %03d %03d***", p->p->id, x, y);
     if(mySend(p->p->sock, mess, 25) == -1) r = EXIT_FAILURE;    
-    if(r == EXIT_SUCCESS) r = init_joueur(p->next, l, welcome);
+    if(r == EXIT_SUCCESS) r = init_joueur(p->next, l, g,welcome);
     return r;
 }
 
@@ -272,6 +272,13 @@ int send_move_points(player *p) {
     return EXIT_SUCCESS;
 }
 
+int send_trap(game *g, player *p, int x, int y, int score) {
+    char mess[50];
+    snprintf(mess, 50, "TRAP! %03d %03d %04d+++", x, y, score);
+    int r = sendto(g->sock_udp, mess, 21, 0,(struct sockaddr *) &(p->addr), sizeof(struct sockaddr_in));
+    return r;
+}
+
 //0 -> UP | 1 -> DOWN | 2 -> LEFT | 3 -> RIGHT
 int move(char *mess, player *p, game *g, int dir) {
     int d = atoi(mess + 6);
@@ -309,6 +316,11 @@ int move(char *mess, player *p, game *g, int dir) {
                 end = 1;
             }
         } 
+        if(g->lab->tab[p->y + dy][p->x + dx] == 2) {
+            //SEND TRAP!
+            score -= 50;
+            send_trap(g, p, p->x + dx, p->y + dy, p->score + score);
+        }
         p->x += dx;
         p->y += dy;
     }

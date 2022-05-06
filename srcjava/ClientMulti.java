@@ -69,7 +69,7 @@ public class ClientMulti implements Runnable {
     public void resGhost(byte[] res, int len) {
         if(len != 16) {
             System.out.println("Error len recv multi GHOST");
-            System.exit(1);
+            return;
         }
         int x = Integer.parseInt(new String(res, 6, 3));
         int y = Integer.parseInt(new String(res, 10, 3));
@@ -80,7 +80,7 @@ public class ClientMulti implements Runnable {
     public void resScore(byte[] res, int len) {
         if(len != 30) {
             System.out.println("Error len recv multi SCORE");
-            System.exit(1);
+            return;
         }
         String id = new String(res, 6, 8);
         int p = Integer.parseInt(new String(res, 15, 4));
@@ -102,7 +102,7 @@ public class ClientMulti implements Runnable {
     public void resEndGame(byte[] res, int len) {
         if(len != 22) {
             System.out.println("Error len recv multi ENDGA");
-            System.exit(0);
+            return;
         }
 
         String id = new String(res, 6, 8);

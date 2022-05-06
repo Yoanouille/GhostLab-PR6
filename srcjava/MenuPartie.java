@@ -3,6 +3,7 @@ package srcjava;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.io.IOException;
+import java.time.chrono.HijrahEra;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -191,6 +192,12 @@ public class MenuPartie extends JPanel{
         }
     }
 
+    public void addTrap(int x, int y) {
+        synchronized(data) {
+            data[x][y] = 3;
+        }
+    }
+
     private void send_to_player(JTextField text){
         if(player_list.getSelectedValue() != null){
             String g = player_list.getSelectedValue();
@@ -286,14 +293,15 @@ public class MenuPartie extends JPanel{
                     dy = 0;
                     break;
             }
-
             
-            for(int i = 0; i < len; i++){
-                data[this.x+(i*dx)][this.y+(i*dy)] = 1;
-            }
-            if (len < queueMovelen.pop()){
-                if(this.x+(len+1)*dx >= 0 && this.x+(len+1)*dx < data.length && this.y+(len+1)*dy >= 0 && this.y+(len+1)*dy < data[x].length)
-                data[this.x+(len+1)*dx][this.y+(len+1)*dy]=2;
+            synchronized(data) {
+                for(int i = 0; i < len; i++){
+                    if(data[this.x + (i*dx)][this.y + (i*dy)] == 0) data[this.x+(i*dx)][this.y+(i*dy)] = 1;
+                }
+                if (len < queueMovelen.pop()){
+                    if(this.x+(len+1)*dx >= 0 && this.x+(len+1)*dx < data.length && this.y+(len+1)*dy >= 0 && this.y+(len+1)*dy < data[x].length)
+                    data[this.x+(len+1)*dx][this.y+(len+1)*dy]=2;
+                }
             }
         }
         this.x = x;
@@ -334,21 +342,32 @@ public class MenuPartie extends JPanel{
                         case 2:
                             c = Color.BLACK;
                             break;
-
+                   
                         default:
                             c = Color.ORANGE;
                             break;
                     }
-                    g.setColor(c);
-                    g.fillRect(i * width / data.length + 1, j * height / data[i].length + 1, width / data.length -2,
-                            height / data[i].length -2);
+
+                    if(currentCase == 3) {
+                        //System.out.println("draw trap");
+                        g.setColor(Color.BLACK);
+                        int sclX = (width)/ data.length;
+                        int sclY = (height) / data[i].length;
+                        //System.out.println(sclX + " " + sclY + " " + (i * sclX + sclX / 4) + " " + j * sclY + sclY / 4);
+                        g.fillRect(i * sclX + sclX / 4, j * sclY + sclY / 4, sclX / 2, sclY / 2);
+                    } else {
+                        g.setColor(c);
+                        g.fillRect(i * width / data.length + 1, j * height / data[i].length + 1, width / data.length -2, height / data[i].length -2);
+                    }
+
+                    // g.setColor(c);
+                    // g.fillRect(i * width / data.length + 1, j * height / data[i].length + 1, width / data.length -2, height / data[i].length -2);
 
                 } 
             }
             if(x >= 0 && y >= 0){
                 g.setColor(Color.BLUE);
-                g.fillRect(x * width / data.length + 1, y * height / data[x].length + 1, width / data.length -2,
-                height / data[x].length -2);
+                g.fillRect(x * width / data.length + 1, y * height / data[x].length + 1, width / data.length -2, height / data[x].length -2);
             }
 
 

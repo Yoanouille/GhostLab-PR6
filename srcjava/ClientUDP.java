@@ -61,6 +61,10 @@ public class ClientUDP implements Runnable {
             case "MESSP" :
                 resMessp(res, len);
                 break;
+            
+            case "TRAP!" :
+                resTrap(res, len);
+                break;
         }
     }
 
@@ -71,6 +75,17 @@ public class ClientUDP implements Runnable {
 
         System.out.println(id + " vous a envoyé " + mess);
         //TODO: afficher sur l'interface
+    }
+
+    public void resTrap(byte[] res, int len) {
+        if(len != 21) {
+            System.out.println("Error len rcv TRAP!");
+            return;
+        }
+        int x = Integer.parseInt(new String(res, 6, 3));
+        int y = Integer.parseInt(new String(res, 10, 3));
+
+        fe.addTrap(x, y);
     }
 
 }

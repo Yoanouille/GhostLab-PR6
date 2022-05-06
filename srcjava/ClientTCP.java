@@ -87,21 +87,18 @@ public class ClientTCP implements Runnable {
     public void errorOgame() {
         if(count_ogame != 0) {
             System.out.println("Error didn't receive the rigth number of OGAME");
-            System.exit(1);
         }
     }
 
     public void errorPlayr() {
         if(count_list != 0) {
             System.out.println("Error didn't receive the right number of PLAYR");
-            System.exit(1);
         }
     }
 
     public void errorGlis() {
         if(count_glis != 0) {
             System.out.println("Error didn't receive the right number of GPLYR");
-            System.exit(1);
         }
     }
 
@@ -374,7 +371,7 @@ public class ClientTCP implements Runnable {
     public void resGame(byte[] res, int len) {
         if(len != 10) {
             System.out.println("Error len recv GAMES");
-            System.exit(1);
+            return;
         }
         count_ogame = res[6];
         fe.reset_games();
@@ -385,7 +382,7 @@ public class ClientTCP implements Runnable {
     public void resOgame(byte[] res, int len) {
         if(len != 12) {
             System.out.println("Error len recv OGAME");
-            System.exit(1);
+            return;
         }
         count_ogame--;
         fe.add_game((int) res[6],(int) (res[8]));
@@ -402,7 +399,7 @@ public class ClientTCP implements Runnable {
     public void resRegOK(byte[] res, int len) {
         if(len != 10) {
             System.out.println("Error len recv REGOK");
-            System.exit(1);
+            return;
         }
         System.out.println("Vous avez été bien inscrit à la partie " + (res[6] & 0xff));
         fe.getAccueil().reg = true;
@@ -413,7 +410,7 @@ public class ClientTCP implements Runnable {
     public void resRegNO(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv REGNO");
-            System.exit(1);
+            return;
         }
         System.out.println("Vous pouvez pas vous y incrire !");
         //send = "";
@@ -423,7 +420,7 @@ public class ClientTCP implements Runnable {
     public void resUnRegOK(byte[] res, int len) {
         if(len != 10) {
             System.out.println("Error len recv UNROK");
-            System.exit(1);
+            return;
         }
         System.out.println("Vous vous êtes bien désinscrit de la partie " + res[6]);
         fe.getAccueil().reg = false;
@@ -434,7 +431,7 @@ public class ClientTCP implements Runnable {
     public void resDUNNO(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv DUNNO");
-            System.exit(1);
+            return;
         }
         System.out.println("IMPOSSIBLE !");
         //send = "";
@@ -444,7 +441,7 @@ public class ClientTCP implements Runnable {
     public void resSize(byte[] res, int len) {
         if(len != 16) {
             System.out.println("Error len recv SIZE");
-            System.exit(1);
+            return;
         }
         int h = ((res[9] & 0xff) << 8) | (res[8] & 0xff);
         int w = ((res[12] & 0xff) << 8) | (res[11] & 0xff);
@@ -459,7 +456,7 @@ public class ClientTCP implements Runnable {
     public void resList(byte[] res, int len) {
         if(len != 12) {
             System.out.println("Error len recv LIST");
-            System.exit(1);
+            return;
         }
         System.out.println("Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]);
         count_list = res[8];
@@ -473,7 +470,7 @@ public class ClientTCP implements Runnable {
     public void resPlayr(byte[] res, int len) {
         if(len != 17) {
             System.out.println("Error len recv PLAYR");
-            System.exit(1);
+            return;
         }
         String nom = new String(res, 6, 8);
         
@@ -496,7 +493,7 @@ public class ClientTCP implements Runnable {
     public void resWelco(byte[] res, int len) {
         if(len != 39) {
             System.out.println("Error len recv WELCO");
-            System.exit(1);
+            return;
         }
         
         int num_partie = res[6] & 0xff;
@@ -524,7 +521,7 @@ public class ClientTCP implements Runnable {
     public void resPosit(byte[] res, int len) {
         if(len != 25) {
             System.out.println("Error len recv POSIT");
-            System.exit(1);
+            return;
         }
 
         String id = new String(res, 6, 8);
@@ -538,7 +535,7 @@ public class ClientTCP implements Runnable {
     public void resMove(byte[] res, int len) {
         if(len != 16) {
             System.out.println("Error len recv MOVE!");
-            System.exit(1);
+            return;
         }
 
         int x = Integer.parseInt(new String(res, 6, 3));
@@ -550,7 +547,7 @@ public class ClientTCP implements Runnable {
     public void resMoveF(byte[] res, int len) {
         if(len != 21) {
             System.out.println("Error len recv MOVE!");
-            System.exit(1);
+            return;
         }
 
         int x = Integer.parseInt(new String(res, 6, 3));
@@ -565,7 +562,7 @@ public class ClientTCP implements Runnable {
     public void resGoodBye(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv GOBYE");
-            System.exit(1);
+            return;
         }
 
         System.out.println("Au revoir !");
@@ -579,7 +576,7 @@ public class ClientTCP implements Runnable {
     public void resGlis(byte[] res, int len) {
         if(len != 10) {
             System.out.println("Error len recv GLIS!");
-            System.exit(1);
+            return;
         }
 
         count_glis = res[6];
@@ -590,7 +587,7 @@ public class ClientTCP implements Runnable {
     public void resGplyr(byte[] res, int len) {
         if(len != 30) {
             System.out.println("Error len recv GPLYR");
-            System.exit(1);
+            return;
         }
 
         count_glis--;
@@ -607,7 +604,7 @@ public class ClientTCP implements Runnable {
     public void resMall(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv MALL!");
-            System.exit(1);
+            return;
         }
         System.out.println("Message bien envoyé à tous !");
     }
@@ -615,7 +612,7 @@ public class ClientTCP implements Runnable {
     public void resSend(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv SEND!");
-            System.exit(1);
+            return;
         }
         System.out.println("Message bien envoyé !");
     }
@@ -623,7 +620,7 @@ public class ClientTCP implements Runnable {
     public void resNSend(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv NSEND");
-            System.exit(1);
+            return;
         }
         System.out.println("Message pas bien envoyé !");
     }
