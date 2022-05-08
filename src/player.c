@@ -96,3 +96,9 @@ void print_player_list(player_list *l) {
     printf("%d ", l->p->sock);
     print_player_list(l->next);
 }
+
+int is_on_player(player_list *l, int x, int y) {
+    if(l == NULL) return 0;
+    if(l->p->x == x && l->p->y == y) return 1;
+    return is_on_player(l->next, x, y);
+}

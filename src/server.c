@@ -19,7 +19,7 @@ void *ghost_thread(void *arg) {
             pthread_mutex_unlock(&lock);
             break;
         }
-        place_ghost(g->ghosts, nb_ghost, g->lab);
+        place_ghost(g->ghosts, nb_ghost, g->lab, g->players);
         for(int i = 0; i < nb_ghost; i++) {
             if(!g->ghosts[i].catched) {
                 printf("J'envoie ghost !\n");

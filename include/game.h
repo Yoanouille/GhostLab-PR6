@@ -52,4 +52,8 @@ int size_list_game_active(game_list *l);
 void print_game(game *g);
 void print_list_game(game_list *g);
 
+
+void init_ghost(ghost *g, int len, lab *l, player_list *lp);
+void place_ghost(ghost *g, int len, lab *l, player_list *lp);
+
 #endif

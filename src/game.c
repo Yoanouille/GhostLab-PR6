@@ -9,6 +9,9 @@ game *gen_game(int w, int h) {
 
     g->lab = build_lab(w, h);
     gen_lab(g->lab);
+    gen_piege(g->lab, 20);
+
+    print_lab_2(g->lab);
 
     g->players = NULL;
     g->id = 0;
@@ -133,4 +136,24 @@ void print_list_game(game_list *g) {
     }
     print_game(g->g);
     print_list_game(g->next);
+}
+
+void init_ghost(ghost *g, int len, lab *l, player_list *lp) {
+    place_ghost(g, len, l, lp);
+    for(int i = 0; i < len; i++) {
+        g[i].catched = 0;
+    }
+}
+
+void place_ghost(ghost *g, int len, lab *l, player_list *lp) {
+    for(int i = 0; i < len; i++) {
+        int x = 0;
+        int y = 0;
+        do {
+            x = rand() % (l->w);
+            y = rand() % (l->h);
+        } while(l->tab[y][x] == 0 || is_on_player(lp, x, y) || is_on_ghost_not_catched(g, len, x, y));
+        g[i].x = x;
+        g[i].y = y;
+    }
 }

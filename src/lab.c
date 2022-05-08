@@ -51,7 +51,8 @@ void print_lab_2(lab *l) {
     for(int i = 0; i < l->h; i++) {
         for(int j = 0; j < l->w; j++) {
             if(l -> tab[i][j] == 0) printf("\u25A0 ");
-            else printf("\u25A1 ");    
+            else if(l -> tab[i][j] == 1) printf("\u25A1 ");    
+            else if(l->tab[i][j] == 2) printf("\u25A3 ");
         }
         printf("\n");
     }
@@ -151,6 +152,27 @@ void gen_lab(lab *l) {
             //printf("\n");
         }
         list = remove_wall(list, r);
+    }
+}
+
+int have_two_free_neighbors(lab *l, int i, int j) {
+    int nb_neighbors = 0;
+    if(i > 0 && l->tab[i - 1][j] == 1) nb_neighbors++;
+    if(i < l->h - 1 && l->tab[i + 1][j] == 1) nb_neighbors++;
+    if(j > 0 && l->tab[i][j - 1] == 1) nb_neighbors++;
+    if(j < l->w - 1 && l->tab[i][j + 1] == 1) nb_neighbors++;
+    return (nb_neighbors >= 2);
+}
+
+void gen_piege(lab *l, int nb_piege) {
+    for(int i = 0; i < nb_piege; i++) {
+        int i = 0;
+        int j = 0;
+        do {
+            j = rand() % l->w;
+            i = rand() % l->h;
+        } while(!have_two_free_neighbors(l, i, j) || l->tab[i][j] != 0);
+        l->tab[i][j] = 2;
     }
 }
 

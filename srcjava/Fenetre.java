@@ -122,4 +122,8 @@ public class Fenetre extends JFrame {
         jeu.addPosToDraw(x, y, "player");
     }
 
+    public void addTrap(int x, int y) {
+        jeu.addTrap(x, y);
+    }
+
 }
