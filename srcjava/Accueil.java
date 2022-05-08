@@ -25,22 +25,22 @@ public class Accueil extends JPanel{
 
     private JTextField id = new JTextField();
 
-    private JButton create_game = new JButton("Create a new Game");
+    private BetterButton create_game = new BetterButton("Create a new Game");
     
 
-    private JButton register = new JButton("register");
+    private BetterButton register = new BetterButton("Register");
 
-    private JButton start = new JButton("Start");
+    private BetterButton start = new BetterButton("Start");
 
-    private JButton detail = new JButton("Details");
+    private BetterButton detail = new BetterButton("Details");
 
     public JLabel info = new JLabel("Nothing for now");
 
-    private JButton size = new JButton("Size of lab");
+    private BetterButton size = new BetterButton("Size of lab");
 
-    private JButton unregister = new JButton ("Unregister");
+    private BetterButton unregister = new BetterButton ("Unregister");
 
-    private JButton refresh = new JButton ("refresh");
+    private BetterButton refresh = new BetterButton ("refresh");
 
     public Boolean reg = false;
 
@@ -58,6 +58,7 @@ public class Accueil extends JPanel{
          super();
          this.limit = limit;
          toUppercase = upper;
+         
          }
        
         public void insertString
@@ -110,6 +111,7 @@ public class Accueil extends JPanel{
 
         games_list.setVisibleRowCount(10);
         games_list.setLayoutOrientation(JList.VERTICAL);
+        games_list.setFont(new Font("Verdana", Font.PLAIN,  20));
         JScrollPane list = new JScrollPane(games_list);
 
         this.setLayout(gridLayout);
@@ -117,21 +119,47 @@ public class Accueil extends JPanel{
 
         GridLayout g = new GridLayout(0,1);
         g.setVgap(30);
-        rightPane.setLayout(g);
-        register.setBorder(BorderFactory.createCompoundBorder());
-
         
+
+        id.setFont(new Font("Verdana", Font.PLAIN,  20));
+        id.setHorizontalAlignment(SwingConstants.CENTER);
         id.setDocument(new JTextFieldLimit(8));
 
-        rightPane.add(id);
-        rightPane.add(create_game);
-        rightPane.add(start);
-        rightPane.add(register);
-        rightPane.add(detail);
-        rightPane.add(size);
-        rightPane.add(unregister);
-        rightPane.add(info);
-        rightPane.add(refresh);
+        rightPane.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        //c.ipady = 40;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.insets = new Insets(10,10,10,10);
+        rightPane.add(id, c);
+
+        c.gridy = 1;
+        rightPane.add(create_game,c);
+
+        c.gridy = 2;
+        rightPane.add(start,c);
+
+        c.gridy = 3;
+        rightPane.add(register,c);
+
+        c.gridy = 4;
+        rightPane.add(detail,c);
+
+        c.gridy = 5;
+        rightPane.add(size, c);
+
+        c.gridy = 6;
+        rightPane.add(unregister,c);
+
+        c.gridy = 7;
+        info.setFont(new Font("Verdana", Font.PLAIN,  20));
+        rightPane.add(info,c);
+
+        c.gridy = 8;
+        rightPane.add(refresh, c);
+
+        rightPane.setBackground(Color.decode("#758078"));
 
         this.add(rightPane);
 

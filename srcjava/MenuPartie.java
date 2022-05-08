@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.BoxLayout;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
@@ -67,21 +68,22 @@ public class MenuPartie extends JPanel{
         JPanel d_cross = new JPanel();
         d_cross.setLayout(new BoxLayout(d_cross,BoxLayout.X_AXIS));
 
-        JButton up = new JButton("\u2191");
+        BetterButton up = new BetterButton("\u2191");
         up.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton down = new JButton("\u2193");
+        BetterButton down = new BetterButton("\u2193");
         down.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 
-        JButton right = new JButton("\u2192");
-        JButton left = new JButton("\u2190");
+        BetterButton right = new BetterButton("\u2192");
+        BetterButton left = new BetterButton("\u2190");
 
         JLabel nextMove = new JLabel(" ");
+        nextMove.setFont(new Font("Verdana", Font.PLAIN,  20));
         nextMove.setAlignmentX(Component.CENTER_ALIGNMENT);
        
 
-        JButton move = new JButton("Move");
+        BetterButton move = new BetterButton("Move");
         move.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         up.addActionListener((ActionEvent e) -> {
@@ -117,7 +119,7 @@ public class MenuPartie extends JPanel{
 
         JScrollPane list = new JScrollPane(player_list);
 
-        JButton actu = new JButton("actualiser");
+        BetterButton actu = new BetterButton("actualiser");
         actu.addActionListener((ActionEvent e) -> refresh());
         actu.setAlignmentX(Component.CENTER_ALIGNMENT);
         
@@ -127,11 +129,11 @@ public class MenuPartie extends JPanel{
         message.setAutoscrolls(true);
         
         
-        JButton send_to = new JButton("Send to :");
+        BetterButton send_to = new BetterButton("Send to :");
         send_to.setAlignmentX(Component.CENTER_ALIGNMENT);
         send_to.addActionListener((ActionEvent e) -> send_to_player(message));
 
-        JButton send_all = new JButton("Send to all");
+        BetterButton send_all = new BetterButton("Send to all");
         send_all.setAlignmentX(Component.CENTER_ALIGNMENT);
         send_all.addActionListener((ActionEvent e) -> send_to_all(message));
 
