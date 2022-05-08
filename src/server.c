@@ -13,7 +13,6 @@ void *ghost_thread(void *arg) {
 
     while(1) {
         sleep(10);
-        printf("coucou\n");
         pthread_mutex_lock(&lock);
         if(g == NULL || g->finished || all_catched(g->ghosts, nb_ghost)) {
             printf("Fin thread fantome\n");

@@ -34,7 +34,6 @@ void send_ogame(game_list *l, char *mess) {
 
 
 int send_game(int sock, game_list *l) {
-    print_list_game(l);
     uint8_t nb_game = size_list_game_active(l);
     char mess[10 + nb_game * 12];
     memset(mess, 0, 10 + nb_game * 12);
