@@ -461,7 +461,7 @@ public class ClientTCP implements Runnable {
         System.out.println("Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]);
         count_list = res[8];
 
-        fe.getAccueil().info.setText("Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]+":");
+        fe.getAccueil().info.setText("<html>Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]+":</html>");
         first_player = true;
         //send = "";
         //ICI Actualiser l'interface graphique
@@ -474,11 +474,11 @@ public class ClientTCP implements Runnable {
         }
         String nom = new String(res, 6, 8);
         
-        String base = fe.getAccueil().info.getText();
+        String base = fe.getAccueil().info.getText().substring(0,fe.getAccueil().info.getText().length()-7);
         if(first_player){
             first_player = false;
-            fe.getAccueil().info.setText(base+" "+nom);
-        }else fe.getAccueil().info.setText(base+", "+nom);
+            fe.getAccueil().info.setText(base+" "+nom+"</html>");
+        }else fe.getAccueil().info.setText(base+", "+nom+"</html>");
         
 
         //Ajouter le nom dans une liste

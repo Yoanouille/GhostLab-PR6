@@ -2,7 +2,11 @@ package srcjava;
 
 import javax.swing.*;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Component;
+
 import java.lang.reflect.InvocationTargetException;
 
 public class Fenetre extends JFrame {
@@ -21,7 +25,7 @@ public class Fenetre extends JFrame {
         super();
         c.setFenetre(this);
         this.client = c;
-        this.setSize(800, 500);
+        this.setSize(800, 520);
         this.setTitle("Ghost Lab");
         this.setVisible(true);
         // this.setResizable(false);
@@ -112,6 +116,15 @@ public class Fenetre extends JFrame {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    public void add_message(String id, String msg){
+        jeu.historic.setText(jeu.historic.getText().substring(0,jeu.historic.getText().length()-7)+"<br>"+id+": "+msg+"</html>");
+
+    }
+
+    public void add_messageP(String id, String msg){
+        jeu.historic.setText(jeu.historic.getText().substring(0,jeu.historic.getText().length()-7)+"<br><font color='red'>"+id+"(to you)"+msg+"</font></html>");
     }
 
     public void drawGhost(int x, int y) {

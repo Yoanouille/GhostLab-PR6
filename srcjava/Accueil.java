@@ -9,6 +9,8 @@ import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+import javax.swing.JViewport;
+
 
 
 public class Accueil extends JPanel{
@@ -18,6 +20,8 @@ public class Accueil extends JPanel{
     private Fenetre fenetre;
 
     private JPanel rightPane = new JPanel();
+
+    private JScrollPane rightPane_ScrollPane = new JScrollPane(rightPane,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
     public DefaultListModel<String> games = new DefaultListModel<String>();
 
@@ -153,13 +157,15 @@ public class Accueil extends JPanel{
         rightPane.add(unregister,c);
 
         c.gridy = 7;
-        info.setFont(new Font("Verdana", Font.PLAIN,  20));
+        info.setFont(new Font("Verdana", Font.PLAIN,  15));
         rightPane.add(info,c);
 
         c.gridy = 8;
         rightPane.add(refresh, c);
 
         rightPane.setBackground(Color.decode("#758078"));
+        
+        
 
         this.add(rightPane);
 

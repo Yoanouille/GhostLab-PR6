@@ -2,12 +2,17 @@ package srcjava;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Font;
+
 import java.io.IOException;
 import java.time.chrono.HijrahEra;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+
+import srcjava.Fenetre;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -28,6 +33,9 @@ public class MenuPartie extends JPanel{
     
     public DefaultListModel<String> players = new DefaultListModel<String>();
     private JList<String> player_list = new JList<String>(players);
+
+    public JLabel historic = new JLabel("<html></html>");
+    private JScrollPane historic_ScrollPane = new JScrollPane(historic);
 
     private HashSet<PosOp> setOfDraw = new HashSet<>();
     
@@ -71,16 +79,18 @@ public class MenuPartie extends JPanel{
 
         BetterButton up = new BetterButton("\u2191");
         up.setAlignmentX(Component.CENTER_ALIGNMENT);
+        up.setFont(new Font("arial", Font.PLAIN,  20));
 
         BetterButton down = new BetterButton("\u2193");
         down.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        down.setFont(new Font("arial", Font.PLAIN,  20));
 
         BetterButton right = new BetterButton("\u2192");
+        right.setFont(new Font("arial", Font.PLAIN,  20));
         BetterButton left = new BetterButton("\u2190");
-
+        left.setFont(new Font("arial", Font.PLAIN,  20));
         JLabel nextMove = new JLabel(" ");
-        nextMove.setFont(new Font("Verdana", Font.PLAIN,  20));
+        nextMove.setFont(new Font("arial", Font.PLAIN,  20));
         nextMove.setAlignmentX(Component.CENTER_ALIGNMENT);
        
 
@@ -142,8 +152,16 @@ public class MenuPartie extends JPanel{
         buttons_send.setLayout(new BoxLayout(buttons_send,BoxLayout.X_AXIS));
         buttons_send.add(send_all);
         buttons_send.add(send_to);
+        
+        JPanel players_and_chatbox = new JPanel();
+        
+        players_and_chatbox.setLayout(new GridLayout(1,0));
+        players_and_chatbox.add(list);
+        players_and_chatbox.add(historic_ScrollPane);
+        
         chatMenu.add(actu);
-        chatMenu.add(list);
+
+        chatMenu.add(players_and_chatbox);
         chatMenu.add(message);
         chatMenu.add(buttons_send);
 
@@ -205,6 +223,7 @@ public class MenuPartie extends JPanel{
             String g = player_list.getSelectedValue();
             String id = g.substring(0,8);
             try {
+                // fenetre.add_messageP(id, text.getText());
                 fenetre.getClient().reqSend(id,text.getText());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -214,6 +233,7 @@ public class MenuPartie extends JPanel{
 
     private void send_to_all(JTextField text){
         try {
+            // fenetre.add_message("billy", text.getText());
             fenetre.getClient().reqMall(text.getText());
         } catch (IOException e) {
             e.printStackTrace();

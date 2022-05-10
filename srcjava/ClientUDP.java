@@ -74,7 +74,8 @@ public class ClientUDP implements Runnable {
         mess = mess.substring(0, mess.length() - 3);
 
         System.out.println(id + " vous a envoyé " + mess);
-        //TODO: afficher sur l'interface
+        fe.add_messageP(id, mess);
+
     }
 
     public void resTrap(byte[] res, int len) {

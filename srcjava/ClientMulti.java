@@ -96,7 +96,7 @@ public class ClientMulti implements Runnable {
         mess = mess.substring(0, mess.length() - 3);
         System.out.println(id +": "+mess);
 
-        //TODO: Mettre à jour l'interface
+        fe.add_message(id, mess);
     }
 
     public void resEndGame(byte[] res, int len) {
