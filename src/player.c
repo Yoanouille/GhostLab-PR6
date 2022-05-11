@@ -102,3 +102,9 @@ int is_on_player(player_list *l, int x, int y) {
     if(l->p->x == x && l->p->y == y) return 1;
     return is_on_player(l->next, x, y);
 }
+
+int has_port(player_list *l, int port) {
+    if(l == NULL) return 0;
+    if(ntohs(l->p->addr.sin_port) == port) return 1;
+    return has_port(l->next, port);
+}

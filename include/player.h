@@ -37,5 +37,6 @@ player *get_player_from_sock(player_list *l, int sock);
 
 void print_player_list(player_list *l);
 int is_on_player(player_list *l, int x, int y);
+int has_port(player_list *l, int port);
 
 #endif

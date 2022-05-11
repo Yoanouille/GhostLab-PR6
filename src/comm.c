@@ -172,9 +172,16 @@ int req_List(player *p, char *mess, game_list *l) {
     return EXIT_SUCCESS;
 }
 
+int getPort(game *g) {
+    while(has_port(g->players, multi_port)) {
+        multi_port++;
+    }
+    return multi_port;
+}
+
 int init_game(game *g) {
     //Initialisation de la socket UDP
-    int his_port = multi_port;
+    int his_port = getPort(g);
     multi_port++;
     int sock = socket(PF_INET, SOCK_DGRAM, 0);
     if(sock == -1) {
