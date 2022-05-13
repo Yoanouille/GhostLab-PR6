@@ -1,5 +1,6 @@
 #include "game.h"
 
+
 game *gen_game(int w, int h) {
     game *g = malloc(sizeof(game));
     if(g == NULL) {
@@ -9,7 +10,7 @@ game *gen_game(int w, int h) {
 
     g->lab = build_lab(w, h);
     gen_lab(g->lab);
-    gen_piege(g->lab, 20);
+    gen_piege(g->lab, 10);
 
     print_lab_2(g->lab);
 
@@ -27,6 +28,7 @@ game *gen_game(int w, int h) {
 
 void free_game(game *g) {
     destroy_lab(g->lab);
+    close(g->sock_udp);
     remove_all(g->players);
     free(g);
 }
@@ -139,10 +141,12 @@ void print_list_game(game_list *g) {
 }
 
 void init_ghost(ghost *g, int len, lab *l, player_list *lp) {
-    place_ghost(g, len, l, lp);
     for(int i = 0; i < len; i++) {
         g[i].catched = 0;
+        g[i].x = 0;
+        g[i].y = 0;
     }
+    place_ghost(g, len, l, lp);
 }
 
 void place_ghost(ghost *g, int len, lab *l, player_list *lp) {

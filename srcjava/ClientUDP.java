@@ -28,11 +28,16 @@ public class ClientUDP implements Runnable {
     public int getPort() {
         return socket.getLocalPort();
     }
+
+    public void stop() {
+        socket.close();
+        System.out.println("J'essaie de fermer UDP");
+        isRunning = false;
+    }
     
     @Override
     public void run() {
         while(isRunning) {
-            System.out.println("UDP");
             byte[] data = new byte[256];
             DatagramPacket packet = new DatagramPacket(data, data.length);
             try {
@@ -41,6 +46,7 @@ public class ClientUDP implements Runnable {
 
             } catch (IOException e) {
                 System.out.println("End UDP");
+                break;
             }
             if(socket.isClosed()) break;
         }

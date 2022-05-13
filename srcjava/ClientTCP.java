@@ -20,9 +20,9 @@ public class ClientTCP implements Runnable {
     private int count_list = 0;
     private int count_glis = 0;
 
-    public ClientTCP(InetAddress addr, int port) throws IOException {
+    public ClientTCP(InetAddress addr, int port, Fenetre fe) throws IOException {
         socket = new Socket(addr, port);
-        fe = new Fenetre(this);
+        this.fe = fe;
         cUdp = new ClientUDP(fe);
         new Thread(cUdp).start();
     }
@@ -31,6 +31,9 @@ public class ClientTCP implements Runnable {
         this.fe = fe;
     }
 
+    public void stopUDP() {
+        cUdp.stop();
+    }
 
     @Override
     public void run() {
@@ -66,7 +69,8 @@ public class ClientTCP implements Runnable {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("FIN TCP");
+                return;
             }
         }
     }

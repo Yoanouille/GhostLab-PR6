@@ -5,11 +5,16 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.io.IOException;
 import java.awt.Component;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetAddress;
 
 public class Fenetre extends JFrame {
+    private InetAddress ip;
+    private int port;
+
     private ClientTCP client;
 
     private JPanel mainPanel;
@@ -17,14 +22,18 @@ public class Fenetre extends JFrame {
 
     private Accueil acc;
 
+    private Start startScreen;
     private EcranAttente attente;
 
     private MenuPartie jeu;
 
-    public Fenetre(ClientTCP c) {
+    public Fenetre(InetAddress ip, int port) {
         super();
-        c.setFenetre(this);
-        this.client = c;
+
+        this.ip = ip;
+        this.port = port;
+        //c.setFenetre(this);
+        //this.client = c;
         this.setSize(800, 520);
         this.setTitle("Ghost Lab");
         this.setVisible(true);
@@ -36,21 +45,38 @@ public class Fenetre extends JFrame {
 
         mainPanel = new JPanel(cardLayout);
 
-        acc = new Accueil(this);
 
+        //acc = new Accueil(this);
+        startScreen = new Start(this);
         attente = new EcranAttente(this);
 
+        mainPanel.add("start", startScreen);
         mainPanel.add("attente",attente);
-        mainPanel.add("accueil", acc);
         this.add(mainPanel);
 
-        setScene("accueil");
+        setScene("start");
     }
 
     public void initJeu(int w, int h){
         jeu = new MenuPartie(this,w,h);
         mainPanel.add("jeu",jeu);
         setScene("jeu");
+        jeu.setFocusable(true);
+        jeu.requestFocus();
+        jeu.requestFocusInWindow();
+    }
+
+    public void start() {
+        try {
+            client = new ClientTCP(ip, port, this);
+            new Thread(client).start();
+            acc = new Accueil(this);
+            mainPanel.add("accueil", acc);
+            this.setScene("accueil");
+        } catch (IOException e) {
+            System.out.println("Error create client !");
+            System.exit(1);
+        }
     }
 
     public void setPosJoueur(int x,int y){
@@ -137,6 +163,23 @@ public class Fenetre extends JFrame {
 
     public void addTrap(int x, int y) {
         jeu.addTrap(x, y);
+    }
+
+    public void stopUdp() {
+        client.stopUDP();
+    }
+
+    public void sendQuit() {
+        try {
+            client.reqQuit();
+        } catch (IOException e) {
+            System.out.println("Erreur send end !");
+        }
+    }
+
+    public void setEnd(String end) {
+        mainPanel.add("end",new EndScreen(this, end));
+        setScene("end");
     }
 
 }

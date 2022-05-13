@@ -20,13 +20,17 @@ import javax.swing.JTextField;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.BoxLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.awt.*;
 import javax.swing.*;
 
 
-public class MenuPartie extends JPanel{
+public class MenuPartie extends JPanel {
 
     private LinkedList<Integer> queueMovelen = new LinkedList<Integer>();
     private LinkedList<Integer> queueMoveDir = new LinkedList<Integer>();
@@ -99,18 +103,30 @@ public class MenuPartie extends JPanel{
 
         up.addActionListener((ActionEvent e) -> {
             nextMove("\u2191",nextMove);
+            this.requestFocus();
+            this.requestFocusInWindow();
         });
         right.addActionListener((ActionEvent e) -> {
             nextMove("\u2192",nextMove);
+            this.requestFocus();
+            this.requestFocusInWindow();
         });
         down.addActionListener((ActionEvent e) -> {
             nextMove("\u2193",nextMove);
+            this.requestFocus();
+            this.requestFocusInWindow();
         });
         left.addActionListener((ActionEvent e) -> {
             nextMove("\u2190",nextMove);
+            this.requestFocus();
+            this.requestFocusInWindow();
         });
 
-        move.addActionListener((ActionEvent e) -> move(nextMove));
+        move.addActionListener((ActionEvent e) -> {
+            move(nextMove);
+            this.requestFocus();
+            this.requestFocusInWindow();
+        });
 
         d_cross.add(left);
         d_cross.add(down);
@@ -131,7 +147,11 @@ public class MenuPartie extends JPanel{
         JScrollPane list = new JScrollPane(player_list);
 
         BetterButton actu = new BetterButton("actualiser");
-        actu.addActionListener((ActionEvent e) -> refresh());
+        actu.addActionListener((ActionEvent e) -> {
+            refresh();
+            this.requestFocus();
+            this.requestFocusInWindow();
+        });
         actu.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         JTextField message = new JTextField();
@@ -142,11 +162,19 @@ public class MenuPartie extends JPanel{
         
         BetterButton send_to = new BetterButton("Send to :");
         send_to.setAlignmentX(Component.CENTER_ALIGNMENT);
-        send_to.addActionListener((ActionEvent e) -> send_to_player(message));
+        send_to.addActionListener((ActionEvent e) -> {
+            send_to_player(message);
+            this.requestFocus();
+            this.requestFocusInWindow();
+        });
 
         BetterButton send_all = new BetterButton("Send to all");
         send_all.setAlignmentX(Component.CENTER_ALIGNMENT);
-        send_all.addActionListener((ActionEvent e) -> send_to_all(message));
+        send_all.addActionListener((ActionEvent e) -> {
+            send_to_all(message);
+            this.requestFocus();
+            this.requestFocusInWindow();
+        });
 
         JPanel buttons_send = new JPanel();
         buttons_send.setLayout(new BoxLayout(buttons_send,BoxLayout.X_AXIS));
@@ -170,7 +198,22 @@ public class MenuPartie extends JPanel{
 
 
         
+        this.addMouseListener(new MouseListener() {
 
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                requestFocus();
+                requestFocusInWindow();
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+        });
         
 
         this.add(plateau);
@@ -198,6 +241,47 @@ public class MenuPartie extends JPanel{
 
             }
         }).start();;
+
+        setFocusable(true);
+        this.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                //System.out.println(e.getKeyCode());
+                switch(e.getKeyCode()) {
+                    case 38:
+                        nextMove("\u2191",nextMove);
+                        break;
+                    case 39:
+                        nextMove("\u2192",nextMove);
+                        break;
+                    case 40:
+                        nextMove("\u2193",nextMove);
+                        break;
+
+                    case 37:
+                        nextMove("\u2190",nextMove);
+                        break;
+
+                    case 10:
+                        move(nextMove);
+                        break;
+                }
+
+                
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                
+            }
+            
+        });
     }
 
     public void addPosToDraw(int x, int y, String type) {

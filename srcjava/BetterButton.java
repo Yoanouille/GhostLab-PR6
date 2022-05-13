@@ -18,6 +18,8 @@ public class BetterButton extends JButton {
         this.setFont(new Font("Verdana", Font.PLAIN,  20));
         this.setForeground(Color.white);
         this.setBackground(Color.decode("#003678"));
+        //this.setBorderPainted(false);
+        this.setFocusPainted(false);
         this.addMouseListener(new MouseListener(){
 
             @Override

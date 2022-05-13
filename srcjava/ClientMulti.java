@@ -27,7 +27,6 @@ public class ClientMulti implements Runnable {
     @Override
     public void run() {
         while(isRunning) {
-            System.out.println("COUCOU MULTI");
             byte[] data = new byte[256];
             DatagramPacket packet = new DatagramPacket(data, data.length);
             try {
@@ -35,7 +34,8 @@ public class ClientMulti implements Runnable {
                 parseMess(packet);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Erreur Multi");
+                break;
             }
         }     
         System.out.println("FIN MULTI");   
@@ -62,6 +62,7 @@ public class ClientMulti implements Runnable {
                 resMessa(res, len);
                 break;
             case "ENDGA" :
+                resEndGame(res, len);
                 break;
         }
     }
@@ -112,7 +113,9 @@ public class ClientMulti implements Runnable {
 
         isRunning = false;
         //TODO Afficher le gagnant sur l'IG
-
+        fe.setEnd("Le gagnant est " + id + " avec " + p + " points");
+        fe.sendQuit();
+        fe.stopUdp();
     }
 
 }

@@ -3,6 +3,7 @@
 #include <endian.h>
 #include <pthread.h>
 #include <sys/eventfd.h>
+#include <unistd.h>
 #include "player.h"
 #include "lab.h"
 #include "ghost.h"
