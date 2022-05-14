@@ -48,6 +48,8 @@ public class MenuPartie extends JPanel {
 
     private PanneauJeu plateau = new PanneauJeu();
 
+    private boolean isRunning = true;
+
     private int [] [] data;
 
     private int x = -1;
@@ -227,7 +229,7 @@ public class MenuPartie extends JPanel {
 
         this.updateUI();
         new Thread (() -> {
-            while(true){
+            while(isRunning){
                 SwingUtilities.invokeLater(() -> {
                     plateau.repaint();
                     Toolkit.getDefaultToolkit().sync();
@@ -282,6 +284,10 @@ public class MenuPartie extends JPanel {
             }
             
         });
+    }
+
+    public void stop() {
+        isRunning = false;
     }
 
     public void addPosToDraw(int x, int y, String type) {

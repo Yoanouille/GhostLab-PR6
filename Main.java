@@ -14,13 +14,9 @@ public class Main {
         int port = Integer.parseInt(args[1]);
 
         try {
-            ClientTCP c = new ClientTCP(InetAddress.getByName(addr), port);
-            new Thread(c).start();
+            new Fenetre(InetAddress.getByName(addr), port);
         } catch (UnknownHostException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
     }
 }

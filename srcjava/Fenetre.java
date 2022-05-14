@@ -172,6 +172,7 @@ public class Fenetre extends JFrame {
     public void sendQuit() {
         try {
             client.reqQuit();
+            jeu.stop();
         } catch (IOException e) {
             System.out.println("Erreur send end !");
         }
