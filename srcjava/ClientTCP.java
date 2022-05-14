@@ -580,7 +580,6 @@ public class ClientTCP implements Runnable {
         }
         cMulti.stop();
         cUdp.stop();
-        fe.setScene("start");
     }
 
     public void resGlis(byte[] res, int len) {

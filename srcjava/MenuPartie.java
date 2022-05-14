@@ -206,6 +206,7 @@ public class MenuPartie extends JPanel {
         Quit.addActionListener((ActionEvent e) -> {
             try {
                 fenetre.getClient().reqQuit();
+                fenetre.setEnd("Vous avez quitté !");
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
