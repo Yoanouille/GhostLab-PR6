@@ -103,7 +103,7 @@ int req_Regis(player *p, char *mess, game_list *l) {
     return EXIT_SUCCESS;
 }
 
-int req_unReg(player *p, game_list **l) {
+int req_unReg(player *p, game_list **l, void *(*ghost_thread)(void *)) {
     game *g = p->his_game;
     if(g == NULL || p->bool_start_send || g->bool_started){
         char dunno[] = "DUNNO***";
@@ -115,6 +115,8 @@ int req_unReg(player *p, game_list **l) {
     remove_player_game(g,p->sock);
     if(g->num_player == 0) {
         *l = remove_game(*l, g->id);
+    } else if(g->bool_started == 0) {
+        start_game(p, ghost_thread);
     }
     p->his_game = NULL;
     char ok[] = "UNROK m***";
@@ -177,6 +179,22 @@ int getPort(game *g) {
         multi_port++;
     }
     return multi_port;
+}
+
+void start_game(player *p, void *(*ghost_thread)(void *)) {
+    if(all_started(p->his_game->players)) {
+        //Init la game
+        p->his_game->bool_started = 1;
+        init_game(p->his_game);
+        pthread_t *thread_ghost = malloc(sizeof(pthread_t));
+        if(thread_ghost == NULL) {
+            perror("malloc pthread ghost");
+            exit(1);
+        }
+        pthread_create(thread_ghost,NULL,ghost_thread,p->his_game);
+        p->his_game->thread_g = thread_ghost;
+        //Lancer un Thread pour la game !
+    }
 }
 
 int init_game(game *g) {

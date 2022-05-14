@@ -10,7 +10,7 @@ pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 void *ghost_thread(void *arg) {
     game *g = (game *)arg;
-
+    printf("Début thread fantome\n");
     while(1) {
         sleep(10);
         pthread_mutex_lock(&lock);
@@ -50,7 +50,7 @@ int traitement (player *p,char* mess,int* running, int len){
     }else if (strncmp(mess,"UNREG",5) == 0){
         //Unregister the player
         pthread_mutex_lock(&lock);
-        int r = req_unReg(p, &g_list);
+        int r = req_unReg(p, &g_list, ghost_thread);
         pthread_mutex_unlock(&lock);
         return r;
     }else if (strncmp(mess,"SIZE?",5) == 0){
@@ -75,23 +75,8 @@ int traitement (player *p,char* mess,int* running, int len){
         pthread_mutex_lock(&lock);
         p->bool_start_send = 1;
         if(p->his_game != NULL) {
-            if(all_started(p->his_game->players)) {
-                //Init la game
-                p->his_game->bool_started = 1;
-                init_game(p->his_game);
-                pthread_t *thread_ghost = malloc(sizeof(pthread_t));
-                if(thread_ghost == NULL) {
-                    perror("malloc pthread ghost");
-                    exit(1);
-                }
-                pthread_create(thread_ghost,NULL,ghost_thread,p->his_game);
-                p->his_game->thread_g = thread_ghost;
-                //Lancer un Thread pour la game !
-                pthread_mutex_unlock(&lock);
-            } else {  
-                pthread_mutex_unlock(&lock);  
-                //RIEN
-            }
+            start_game(p, ghost_thread);
+            pthread_mutex_unlock(&lock);
         } else pthread_mutex_unlock(&lock);
         return EXIT_SUCCESS;
     }else if(strncmp(mess, "UPMOV", 5) == 0) {
@@ -234,6 +219,8 @@ void *communication(void *arg){
             pthread_mutex_lock(&lock);
             g_list = remove_game(g_list, p->his_game->id);
             printf("GAME REMOVED !\n");
+        } else if(p->his_game->bool_started == 0) {
+            start_game(p, ghost_thread);
         }
     }
     pthread_mutex_unlock(&lock);
