@@ -27,7 +27,7 @@ public class Accueil extends JPanel{
 
     private JList<String> games_list = new JList<String>(games);
 
-    private JTextField id = new JTextField();
+    public JTextField id = new JTextField();
 
     private BetterButton create_game = new BetterButton("Create a new Game");
     
@@ -202,14 +202,15 @@ public class Accueil extends JPanel{
             s[0] = s[0].replaceAll("[^0-9]", "");
             int m = Integer.parseInt(s[0]);
 
-            try {
-                int n = 8 - id.getText().length();
-                char[] spaces = new char[n];
-                Arrays.fill(spaces, ' ');
-                fenetre.getClient().reqRegis(id.getText()+(new String(spaces)),m);
-                refresh();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(id.getText().length() == 8){
+                try {
+                    fenetre.getClient().reqRegis(id.getText(),m);
+                    refresh();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }else {
+                info.setText("You must have an 8 caracter long nickname");
             }
         }else{
             info.setText("You are registered in a game");

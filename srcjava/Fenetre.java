@@ -64,6 +64,7 @@ public class Fenetre extends JFrame {
         jeu.setFocusable(true);
         jeu.requestFocus();
         jeu.requestFocusInWindow();
+        jeu.setId(acc.id.getText());
     }
 
     public void start() {
@@ -123,6 +124,15 @@ public class Fenetre extends JFrame {
         Runnable run=new Runnable(){
             public void run(){
                 jeu.setScore(id, p);
+            }
+        };
+        SwingUtilities.invokeLater(run);
+    }
+
+    public void set_my_score(int p){
+        Runnable run=new Runnable(){
+            public void run(){
+                jeu.setMyScore(p);
             }
         };
         SwingUtilities.invokeLater(run);
@@ -190,5 +200,9 @@ public class Fenetre extends JFrame {
         mainPanel.add("end",new EndScreen(this, end));
         setScene("end");
     }
+
+    public void setJeuId(String id){
+        jeu.setId(id);
+    } 
 
 }

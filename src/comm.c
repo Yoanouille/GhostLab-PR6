@@ -324,13 +324,22 @@ int move(char *mess, player *p, game *g, int dir) {
         } 
         if(g->lab->tab[p->y + dy][p->x + dx] == 2) {
             //SEND TRAP!
-            score -= 50;
-            send_trap(g, p, p->x + dx, p->y + dy, p->score + score);
+            score -= 20;
+             if ((p->score + score ) < 0 ){
+                send_trap(g, p, p->x + dx, p->y + dy, 0);
+            }else {
+                send_trap(g, p, p->x + dx, p->y + dy, p->score + score);
+            }
+            
         }
         p->x += dx;
         p->y += dy;
     }
-    p->score += score;
+    if ((p->score + score ) < 0 ){
+        p->score = 0;
+    }else {
+        p->score += score;
+    }
     int re;
     if(score == 0) re = send_move(p);
     else re = send_move_points(p);

@@ -43,6 +43,7 @@ public class MenuPartie extends JPanel {
 
     private HashSet<PosOp> setOfDraw = new HashSet<>();
     
+    private String my_id;
     
     private Fenetre fenetre;
 
@@ -152,6 +153,7 @@ public class MenuPartie extends JPanel {
 
         BetterButton actu = new BetterButton("actualiser");
         actu.addActionListener((ActionEvent e) -> {
+            System.out.println(my_id);
             refresh();
             this.requestFocus();
             this.requestFocusInWindow();
@@ -239,11 +241,7 @@ public class MenuPartie extends JPanel {
         this.add(rightPane);
 
         this.setVisible(true);
-        System.out.println(actu.getWidth());
-        System.out.println(actu.getParent());    
-        System.out.println(actu.getParent().getParent().getWidth());
-
-
+        refresh();
         this.updateUI();
         new Thread (() -> {
             while(isRunning){
@@ -444,7 +442,15 @@ public class MenuPartie extends JPanel {
         this.x = x;
         this.y = y;
         //plateau.repaint();
-     }
+    }
+
+    public void setId(String id){
+        this.my_id = id;
+    }
+
+    public void setMyScore(int score){
+        setScore(my_id,score);
+    }
     
 
 
