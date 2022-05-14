@@ -177,15 +177,17 @@ public class Accueil extends JPanel{
     public void create_game() {
         //definir le port
         if(!reg){
-            try {
-                int n = 8 - id.getText().length();
-                char[] spaces = new char[n];
-                Arrays.fill(spaces, ' ');
-                fenetre.getClient().reqNewPL(id.getText()+(new String(spaces)));
-                refresh();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(id.getText().length() == 8){
+                try {
+                    fenetre.getClient().reqNewPL(id.getText());
+                    refresh();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }else {
+                info.setText("You must have an 8 caracter long nickname");
             }
+            
         }else {
             info.setText("You are registered in a game");
         }

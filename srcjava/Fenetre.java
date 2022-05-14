@@ -119,6 +119,14 @@ public class Fenetre extends JFrame {
             e.printStackTrace();
         }
     }
+    public void set_player_score(String id, int p){
+        Runnable run=new Runnable(){
+            public void run(){
+                jeu.setScore(id, p);
+            }
+        };
+        SwingUtilities.invokeLater(run);
+    }
 
     public void reset_players(){
         Runnable run=new Runnable(){

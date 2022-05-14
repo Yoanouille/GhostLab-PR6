@@ -89,6 +89,7 @@ public class ClientMulti implements Runnable {
         int y = Integer.parseInt(new String(res, 24, 3));
 
         //TODO: Mettre à jour l'interface
+        fe.set_player_score(id,p);
     }
 
     public void resMessa(byte[] res, int len) {
@@ -116,6 +117,10 @@ public class ClientMulti implements Runnable {
         fe.setEnd("Le gagnant est " + id + " avec " + p + " points");
         fe.sendQuit();
         fe.stopUdp();
+    }
+
+    public void stop(){
+        this.isRunning = false;
     }
 
 }

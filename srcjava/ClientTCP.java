@@ -482,7 +482,10 @@ public class ClientTCP implements Runnable {
         if(first_player){
             first_player = false;
             fe.getAccueil().info.setText(base+" "+nom+"</html>");
-        }else fe.getAccueil().info.setText(base+", "+nom+"</html>");
+        }else{
+            fe.getAccueil().info.setText(base+", "+nom+"</html>");
+            // fe.pack();
+        } 
         
 
         //Ajouter le nom dans une liste
@@ -575,6 +578,9 @@ public class ClientTCP implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        cMulti.stop();
+        cUdp.stop();
+        fe.setScene("start");
     }
 
     public void resGlis(byte[] res, int len) {

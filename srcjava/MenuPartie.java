@@ -146,6 +146,8 @@ public class MenuPartie extends JPanel {
         JPanel chatMenu = new JPanel();
         chatMenu.setLayout(new BoxLayout(chatMenu,BoxLayout.Y_AXIS));
 
+        player_list.setFont(new Font("Arial",Font.BOLD,17));
+        historic.setFont(new Font("Arial",Font.BOLD,17));
         JScrollPane list = new JScrollPane(player_list);
 
         BetterButton actu = new BetterButton("actualiser");
@@ -195,9 +197,23 @@ public class MenuPartie extends JPanel {
         chatMenu.add(message);
         chatMenu.add(buttons_send);
 
+
+        
+
         rightPane.add(chatMenu,BorderLayout.NORTH);
 
-
+        BetterButton Quit = new BetterButton("Quit");
+        Quit.addActionListener((ActionEvent e) -> {
+            try {
+                fenetre.getClient().reqQuit();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            this.requestFocus();
+            this.requestFocusInWindow();
+        });
+        Quit.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        rightPane.add(Quit,BorderLayout.SOUTH);
 
         
         this.addMouseListener(new MouseListener() {
@@ -284,6 +300,14 @@ public class MenuPartie extends JPanel {
             }
             
         });
+    }
+
+    public void setScore(String id, int score){
+       for(int i = 0; i < players.size();i++){
+           if(id.equals(players.getElementAt(i).substring(0, 8))){
+               players.setElementAt(id + " points: " + score, i);
+           }
+       }
     }
 
     public void stop() {
