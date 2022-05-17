@@ -91,7 +91,9 @@ public class ClientUDP implements Runnable {
         }
         int x = Integer.parseInt(new String(res, 6, 3));
         int y = Integer.parseInt(new String(res, 10, 3));
+        int p = Integer.parseInt(new String(res, 14, 4));
 
+        fe.set_my_score(p);
         fe.addTrap(x, y);
     }
 
