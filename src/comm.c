@@ -196,7 +196,7 @@ int init_game(game *g) {
     }
 
     g->sock_udp  = sock;
-    init_ghost(g->ghosts, nb_ghost, g->lab, g->players);
+    init_ghost(g->ghosts, g->nb_ghost, g->lab, g->players);
 
     //Initialisation Welcome
     char welcome[] = "WELCO m hh ww f 225.1.2.4###### port***";
@@ -205,11 +205,10 @@ int init_game(game *g) {
     welcome[9] = (g->lab->h)/256;
     welcome[11] = (g->lab->w)%256;
     welcome[12] = (g->lab->w)/256;
-    welcome[14] = nb_ghost;
+    welcome[14] = g->nb_ghost;
     snprintf(welcome + 32, 8, "%d***", his_port);    
 
     //Initialisation des joueurs
-    print_lab_2(g->lab);
     return init_joueur(g->players, g->lab, g->ghosts,welcome);
 }
 
@@ -220,7 +219,7 @@ int init_joueur(player_list *p, lab *l, ghost *g,char *welcome) {
     do {
         x = rand() % (l->w);
         y = rand() % (l->h);
-    } while(l->tab[y][x] == 0 || is_on_ghost_not_catched(g, nb_ghost, x, y));
+    } while(l->tab[y][x] == 0 || is_on_ghost_not_catched(g, p->p->his_game->nb_ghost, x, y));
 
     p->p->x = x;
     p->p->y = y;
@@ -311,26 +310,32 @@ int move(char *mess, player *p, game *g, int dir) {
             dy = 0;
             break;
     }
+    int bool_score = 0;
+    int bool_trap = 0;
     for(int i = 0; i < d; i++) {
+        bool_score = 0;
+        bool_trap = 0;
         if(p->y + dy < 0 || p->y+dy >= g->lab->h || p->x+dx <0 ||  p->x+dx >= g->lab->w) break;
         if(g->lab->tab[p->y + dy][p->x + dx] == 0) break;
-        if(is_on_ghost(g->ghosts, nb_ghost, p->x + dx, p->y + dy)){
+        if(is_on_ghost(g->ghosts, g->nb_ghost, p->x + dx, p->y + dy)){
             score += 100;
-            //ENVOYER MESSAGE UDP
-            send_score(p, p->x + dx, p->y + dy, p->score + score);
-            if(all_catched(g->ghosts, nb_ghost)) {
+            bool_score = 1;
+            
+            if(all_catched(g->ghosts, g->nb_ghost)) {
                 end = 1;
             }
         } 
         if(g->lab->tab[p->y + dy][p->x + dx] == 2) {
-            //SEND TRAP!
             score -= 20;
-             if ((p->score + score ) < 0 ){
+            bool_trap = 1;   
+        }
+        if(bool_score) send_score(p, p->x + dx, p->y + dy, p->score + score);
+        if(bool_trap) {
+            if ((p->score + score ) < 0 ){
                 send_trap(g, p, p->x + dx, p->y + dy, 0);
             }else {
                 send_trap(g, p, p->x + dx, p->y + dy, p->score + score);
             }
-            
         }
         p->x += dx;
         p->y += dy;
@@ -345,7 +350,6 @@ int move(char *mess, player *p, game *g, int dir) {
     else re = send_move_points(p);
 
     if(end){ //ENVOYER MESSAGE END
-        printf("SEND END\n");
         send_end(p->his_game);
     }
     return re;
@@ -399,20 +403,9 @@ int send_mess_perso(char *req, int len, player *p) {
     char id[9];
     memcpy(id, req + 6, 8);
     id[8] = 0;
-    printf("Il faut envoyé à : %s\n", id);
-
-    for(int i = 0; i < len; i++) {
-        printf("%c", req[i]);
-    }
-    printf(" End\n");
 
     char *mess = req + 15;
     len -= 15;
-
-    for(int i =0; i< len; i++) {
-        printf("%c",mess[i]);
-    }
-    printf(" End\n");
 
     player *p_to = get_player(p->his_game->players, id);
     if(p_to == NULL) {

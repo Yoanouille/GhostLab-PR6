@@ -14,13 +14,13 @@ void *ghost_thread(void *arg) {
     while(1) {
         sleep(10);
         pthread_mutex_lock(&lock);
-        if(g == NULL || g->finished || all_catched(g->ghosts, nb_ghost)) {
+        if(g == NULL || g->finished || all_catched(g->ghosts, g->nb_ghost)) {
             printf("Fin thread fantome\n");
             pthread_mutex_unlock(&lock);
             break;
         }
-        place_ghost(g->ghosts, nb_ghost, g->lab, g->players);
-        for(int i = 0; i < nb_ghost; i++) {
+        place_ghost(g->ghosts, g->nb_ghost, g->lab, g->players);
+        for(int i = 0; i < g->nb_ghost; i++) {
             if(!g->ghosts[i].catched) {
                 printf("J'envoie ghost !\n");
                 send_ghost(g, g->ghosts[i].x, g->ghosts[i].y);
@@ -67,18 +67,19 @@ int traitement (player *p,char* mess,int* running, int len){
     }else if (strncmp(mess,"GAME?",5) == 0){
         //List of still not launched games
         pthread_mutex_lock(&lock);
-        send_game(p->sock, g_list);
+        int r = send_game(p->sock, g_list);
         pthread_mutex_unlock(&lock);
-        return EXIT_SUCCESS;
+        return r;
     }else if (strncmp(mess,"START",5) == 0){
         //Start the game if all players sent start
         pthread_mutex_lock(&lock);
         p->bool_start_send = 1;
+        int r = EXIT_SUCCESS;
         if(p->his_game != NULL) {
             if(all_started(p->his_game->players)) {
                 //Init la game
                 p->his_game->bool_started = 1;
-                init_game(p->his_game);
+                r = init_game(p->his_game);
                 pthread_t *thread_ghost = malloc(sizeof(pthread_t));
                 if(thread_ghost == NULL) {
                     perror("malloc pthread ghost");
@@ -93,60 +94,60 @@ int traitement (player *p,char* mess,int* running, int len){
                 //RIEN
             }
         } else pthread_mutex_unlock(&lock);
-        return EXIT_SUCCESS;
+        return r;
     }else if(strncmp(mess, "UPMOV", 5) == 0) {
         pthread_mutex_lock(&lock);
-        move(mess, p, p->his_game, 0);
+        int r = move(mess, p, p->his_game, 0);
         pthread_mutex_unlock(&lock);
-        return EXIT_SUCCESS;
+        return r;
     }
     else if(strncmp(mess, "DOMOV", 5) == 0) {
         pthread_mutex_lock(&lock);
-        move(mess, p, p->his_game, 1);
+        int r = move(mess, p, p->his_game, 1);
         pthread_mutex_unlock(&lock);
-        return EXIT_SUCCESS;
+        return r;
     }
     else if(strncmp(mess, "LEMOV", 5) == 0) {
         pthread_mutex_lock(&lock);
-        move(mess, p, p->his_game, 2);
+        int r = move(mess, p, p->his_game, 2);
         pthread_mutex_unlock(&lock);
-        return EXIT_SUCCESS;
+        return r;
     }
     else if(strncmp(mess, "RIMOV", 5) == 0) {
         pthread_mutex_lock(&lock);
-        move(mess, p, p->his_game, 3);
+        int r = move(mess, p, p->his_game, 3);
         pthread_mutex_unlock(&lock);
-        return EXIT_SUCCESS;
+        return r;
 
     } else if(strncmp(mess, "GLIS?", 5) == 0) {
         pthread_mutex_lock(&lock);
-        req_glis(p->his_game, p);
+        int r = req_glis(p->his_game, p);
         pthread_mutex_unlock(&lock);
-        return EXIT_SUCCESS;
+        return r;
 
     } else if(strncmp(mess, "IQUIT", 5) == 0) {
         char message [] = "GOBYE***";
-        mySend(p->sock,message,8);
-        return EXIT_FAILURE;
+        int r = mySend(p->sock,message,8);
+        return r;
 
     } else if (strncmp(mess, "MALL?", 5) == 0){
         char *m = mess + 6;
         len -= 6;
         pthread_mutex_lock(&lock);
-        send_mess_all(m, len, p);
+        int r = send_mess_all(m, len, p);
         pthread_mutex_unlock(&lock);
-        return EXIT_SUCCESS;
+        return r;
 
     } else if(strncmp(mess, "SEND?", 5) == 0) {
         pthread_mutex_lock(&lock);
-        send_mess_perso(mess, len, p);
+        int r = send_mess_perso(mess, len, p);
         pthread_mutex_unlock(&lock);
-        return EXIT_SUCCESS;
+        return r;
     }
     else {
         char message [] = "GOBYE***";
-        mySend(p->sock,message,8);
-        return EXIT_FAILURE;
+        int r = mySend(p->sock,message,8);
+        return r;
     }
     return EXIT_FAILURE;
 }
@@ -184,7 +185,7 @@ void *communication(void *arg){
             perror("recv");
             break;
         }else if(re == 0){
-            dprintf(2,"Client closed connection\n");
+            printf("Client closed connection\n");
             break;
         }
         for(int i = 0; i < re; i++) {
@@ -217,10 +218,8 @@ void *communication(void *arg){
 
     pthread_mutex_lock(&lock);
     if(p->his_game != NULL) {
-        printf("num player : %d\n", p->his_game->num_player);
         printf("Je remove le player de la game !\n");
         remove_player_game(p->his_game, p->sock);
-        printf("num player : %d\n", p->his_game->num_player);
         if(p->his_game->num_player == 0) {
             //Attendre le thread si il continue
             printf("TRY GAME REMOVED !\n");

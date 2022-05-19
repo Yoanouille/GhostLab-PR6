@@ -8,11 +8,15 @@ game *gen_game(int w, int h) {
         exit(EXIT_FAILURE);
     }
 
+    w = (rand() % 10) + 10;
+    h = (rand() % 10) + 10;
+    int aire = w * h;
+    int nb_ghost = (aire * 5) / 100;
+    printf("w*h : %d*%d nb_ghost : %d\n", w, h, nb_ghost);
+
     g->lab = build_lab(w, h);
     gen_lab(g->lab);
     gen_piege(g->lab, 10);
-
-    print_lab_2(g->lab);
 
     g->players = NULL;
     g->id = 0;
@@ -21,7 +25,12 @@ game *gen_game(int w, int h) {
     g->finished = 0;
     g->sock_udp = 0;
     g->thread_g = NULL;
-    //g->fd_event = eventfd()
+    g->nb_ghost = nb_ghost;
+    g->ghosts = malloc(nb_ghost * sizeof(ghost));
+    if(g->ghosts == NULL) {
+        perror("malloc ghosts");
+        exit(1);
+    }
 
     return g;
 }
@@ -29,6 +38,7 @@ game *gen_game(int w, int h) {
 void free_game(game *g) {
     destroy_lab(g->lab);
     close(g->sock_udp);
+    free(g->ghosts);
     remove_all(g->players);
     free(g);
 }

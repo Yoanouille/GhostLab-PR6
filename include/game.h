@@ -8,8 +8,6 @@
 #include "lab.h"
 #include "ghost.h"
 
-#define nb_ghost 5
-
 typedef struct player_list player_list;
 typedef struct player player;
 
@@ -22,7 +20,8 @@ typedef struct game {
     int finished;
     int sock_udp;
     struct sockaddr_in addr;
-    ghost ghosts[nb_ghost];
+    ghost *ghosts;
+    int nb_ghost;
     pthread_t *thread_g;
  
 } game;
