@@ -12,10 +12,11 @@ int send_game(int sock, game_list *l);
 
 int req_newPl(player *p, char *mess, game_list **l);
 int req_Regis(player *p, char *mess, game_list *l);
-int req_unReg(player *p, game_list **l);
+int req_unReg(player *p, game_list **l, void *(*ghost_thread)(void *));
 int req_Size(player *p, char *mess, game_list *l);
 int req_List(player *p, char *mess, game_list *l);
 
+void start_game(player *p, void *(*ghost_thread)(void *));
 int init_game(game *g);
 int init_joueur(player_list *p, lab *l, ghost *g,char *welcome);
 int send_ghost(game *g, int x, int y);
