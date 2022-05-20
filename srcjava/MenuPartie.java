@@ -493,35 +493,28 @@ public class MenuPartie extends JPanel {
                             break;
                     }
 
-                    if(currentCase == 3) {
-                        //System.out.println("draw trap");
-                        g.setColor(Color.BLACK);
-                        int sclX = (width)/ data.length;
-                        int sclY = (height) / data[i].length;
-                        //System.out.println(sclX + " " + sclY + " " + (i * sclX + sclX / 4) + " " + j * sclY + sclY / 4);
-                        g.fillRect(i * sclX + sclX / 4, j * sclY + sclY / 4, sclX / 2, sclY / 2);
-                    } else {
-                        g.setColor(c);
-                        g.fillRect(i * width / data.length + 1, j * height / data[i].length + 1, width / data.length -2, height / data[i].length -2);
+                    if(currentCase != 3) {
+                        if (i == x && j == y){
+                            g.setColor(Color.BLUE);
+                            g.fillRect(x * width / data.length + 1, y * height / data[x].length + 1, width / data.length -2, height / data[x].length -2);
+                        }else {
+                            g.setColor(c);
+                            g.fillRect(i * width / data.length + 1, j * height / data[i].length + 1, width / data.length -2, height / data[i].length -2);
+                        }
+                    }else{ 
+                        if(currentCase == 3){
+                            if (i == x && j == y){
+                                g.setColor(Color.BLUE);
+                                g.fillRect(x * width / data.length + 1, y * height / data[x].length + 1, width / data.length -2, height / data[x].length -2);
+                            }
+                            g.setColor(new Color(0,0,0,150));
+                            int sclX = (width)/ data.length;
+                            int sclY = (height) / data[i].length;
+                            g.fillRect(i * sclX + sclX / 4, j * sclY + sclY / 4, sclX / 2, sclY / 2);  
+                        }
                     }
-
-                    // g.setColor(c);
-                    // g.fillRect(i * width / data.length + 1, j * height / data[i].length + 1, width / data.length -2, height / data[i].length -2);
-
                 } 
             }
-            if(x >= 0 && y >= 0){
-                g.setColor(Color.BLUE);
-                g.fillRect(x * width / data.length + 1, y * height / data[x].length + 1, width / data.length -2, height / data[x].length -2);
-                if(data[x][y] == 3 ){
-                    g.setColor(new Color(0,0,0,150));
-                    int sclX = (width)/ data.length;
-                    int sclY = (height) / data[x].length;
-                    g.fillRect(x * sclX + sclX / 4, y * sclY + sclY / 4, sclX / 2, sclY / 2);
-                }
-
-            }
-
 
             synchronized(setOfDraw) {
                 LinkedList<PosOp> elt_rm = new LinkedList<>();
