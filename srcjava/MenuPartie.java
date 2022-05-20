@@ -20,6 +20,8 @@ import javax.swing.JTextField;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.BoxLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -191,6 +193,8 @@ public class MenuPartie extends JPanel {
         
         players_and_chatbox.setLayout(new GridLayout(1,0));
         players_and_chatbox.add(list);
+    
+
         players_and_chatbox.add(historic_ScrollPane);
         
         chatMenu.add(actu);
@@ -336,7 +340,6 @@ public class MenuPartie extends JPanel {
             String g = player_list.getSelectedValue();
             String id = g.substring(0,8);
             try {
-                // fenetre.add_messageP(id, text.getText());
                 fenetre.getClient().reqSend(id,text.getText());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -346,7 +349,6 @@ public class MenuPartie extends JPanel {
 
     private void send_to_all(JTextField text){
         try {
-            // fenetre.add_message("billy", text.getText());
             fenetre.getClient().reqMall(text.getText());
         } catch (IOException e) {
             e.printStackTrace();
@@ -511,6 +513,13 @@ public class MenuPartie extends JPanel {
             if(x >= 0 && y >= 0){
                 g.setColor(Color.BLUE);
                 g.fillRect(x * width / data.length + 1, y * height / data[x].length + 1, width / data.length -2, height / data[x].length -2);
+                if(data[x][y] == 3 ){
+                    g.setColor(new Color(0,0,0,150));
+                    int sclX = (width)/ data.length;
+                    int sclY = (height) / data[x].length;
+                    g.fillRect(x * sclX + sclX / 4, y * sclY + sclY / 4, sclX / 2, sclY / 2);
+                }
+
             }
 
 
@@ -521,6 +530,12 @@ public class MenuPartie extends JPanel {
                     g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), p.getOpacity()));
                     g.fillRect(p.getX() * width / data.length + 3, p.getY() *  height / data[p.getX()].length + 3 , width / data.length - 6, height / data[x].length - 6);
                     if(p.reduceOp()) elt_rm.add(p);
+                    if(data[p.getX()][p.getY()] == 3 ){
+                        g.setColor(new Color(0,0,0,150));
+                        int sclX = (width)/ data.length;
+                        int sclY = (height) / data[p.getX()].length;
+                        g.fillRect(p.getX() * sclX + sclX / 4, p.getY() * sclY + sclY / 4, sclX / 2, sclY / 2);
+                    }
 
                 }
                 for(PosOp elt : elt_rm) {

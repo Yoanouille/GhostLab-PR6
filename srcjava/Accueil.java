@@ -10,6 +10,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import javax.swing.JViewport;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 
 
 
@@ -132,7 +133,6 @@ public class Accueil extends JPanel{
         rightPane.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-        //c.ipady = 40;
         c.gridx = 0;
         c.gridy = 0;
         c.insets = new Insets(10,10,10,10);
@@ -165,9 +165,17 @@ public class Accueil extends JPanel{
 
         rightPane.setBackground(Color.decode("#758078"));
         
+        rightPane_ScrollPane.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = Color.decode("#003678");
+            }
+        });
         
+        rightPane_ScrollPane.getVerticalScrollBar().setBackground(Color.decode("#758078"));
 
-        this.add(rightPane);
+
+        this.add(rightPane_ScrollPane);
 
         this.setVisible(true);
         this.updateUI();

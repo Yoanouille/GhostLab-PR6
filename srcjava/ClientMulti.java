@@ -50,7 +50,6 @@ public class ClientMulti implements Runnable {
             System.out.println("Error +++ packet !");
             return;
         }
-        System.out.println(mess);
         switch(debut) {
             case "GHOST" :
                 resGhost(res, len);
@@ -88,7 +87,6 @@ public class ClientMulti implements Runnable {
         int x = Integer.parseInt(new String(res, 20, 3));
         int y = Integer.parseInt(new String(res, 24, 3));
 
-        //TODO: Mettre à jour l'interface
         fe.set_player_score(id,p);
     }
 
@@ -113,7 +111,6 @@ public class ClientMulti implements Runnable {
         System.out.println("Le gagnant est " + id + " avec " + p + " points");
 
         isRunning = false;
-        //TODO Afficher le gagnant sur l'IG
         fe.setEnd("Le gagnant est " + id + " avec " + p + " points");
         fe.sendQuit();
         fe.stopUdp();

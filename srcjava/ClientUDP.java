@@ -76,7 +76,7 @@ public class ClientUDP implements Runnable {
 
     public void resMessp(byte[] res, int len) {
         String id = new String(res, 6, 8);
-        String mess = new String(res, 15, len);
+        String mess = new String(res, 15, len-15);
         mess = mess.substring(0, mess.length() - 3);
 
         System.out.println(id + " vous a envoyé " + mess);

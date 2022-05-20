@@ -164,7 +164,6 @@ public class Fenetre extends JFrame {
 
     public void add_message(String id, String msg){
         jeu.historic.setText(jeu.historic.getText().substring(0,jeu.historic.getText().length()-7)+"<br>"+id+": "+msg+"</html>");
-
     }
 
     public void add_messageP(String id, String msg){

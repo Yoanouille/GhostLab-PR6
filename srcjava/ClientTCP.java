@@ -8,7 +8,6 @@ public class ClientTCP implements Runnable {
 
     private Socket socket;
     private boolean running = false;
-    private boolean first_player = false;
     private final static int buff_size = 256;
     private Fenetre fe;
 
@@ -379,7 +378,6 @@ public class ClientTCP implements Runnable {
         }
         count_ogame = res[6];
         fe.reset_games();
-        //ICI Mettre à 0 la liste dans l'interface graphique
         System.out.println("Je vais recevoir " + res[6] + " messages OGAME !");
     }
 
@@ -390,13 +388,9 @@ public class ClientTCP implements Runnable {
         }
         count_ogame--;
         fe.add_game((int) res[6],(int) (res[8]));
-        //ICI ajouter à une liste dans l'interface graphique
         System.out.println("Partie " + res[6] + " : " + res[8] + " joueur(s)");
         if(count_ogame == 0) {
-            //send = "";
-            //ICI actualiser l'interface graphique
             System.out.println("J'ai reçu tous les OGAME");
-            
         }
     }
 
@@ -406,9 +400,8 @@ public class ClientTCP implements Runnable {
             return;
         }
         System.out.println("Vous avez été bien inscrit à la partie " + (res[6] & 0xff));
+        fe.getAccueil().info.setText("Vous avez été bien inscrit à la partie " + (res[6] & 0xff));
         fe.getAccueil().reg = true;
-        //send = "";
-        //ICI Actualiser l'interface !
     }
 
     public void resRegNO(byte[] res, int len) {
@@ -417,8 +410,7 @@ public class ClientTCP implements Runnable {
             return;
         }
         System.out.println("Vous pouvez pas vous y incrire !");
-        //send = "";
-        //ICI Actualiser l'interface !
+        fe.getAccueil().info.setText("Vous pouvez pas vous y incrire !");
     }
 
     public void resUnRegOK(byte[] res, int len) {
@@ -428,8 +420,7 @@ public class ClientTCP implements Runnable {
         }
         System.out.println("Vous vous êtes bien désinscrit de la partie " + res[6]);
         fe.getAccueil().reg = false;
-        //send = "";
-        //ICI Actualiser l'interface !
+        fe.getAccueil().info.setText("Vous vous êtes bien désinscrit de la partie " + res[6]);
     }
 
     public void resDUNNO(byte[] res, int len) {
@@ -438,8 +429,7 @@ public class ClientTCP implements Runnable {
             return;
         }
         System.out.println("IMPOSSIBLE !");
-        //send = "";
-        //ICI Actualiser l'interface !
+        fe.getAccueil().info.setText("IMPOSSIBLE !");
     }
 
     public void resSize(byte[] res, int len) {
@@ -450,11 +440,9 @@ public class ClientTCP implements Runnable {
         int h = ((res[9] & 0xff) << 8) | (res[8] & 0xff);
         int w = ((res[12] & 0xff) << 8) | (res[11] & 0xff);
 
-        //send = "";
         System.out.println("Taille du lab : " + w + "x" + h + " (wxh)");
         fe.getAccueil().info.setText("Taille du lab : " + w + "x" + h + " (w x h)");
 
-        //ICI Actualiser l'interface graphique !
     }
 
     public void resList(byte[] res, int len) {
@@ -466,9 +454,6 @@ public class ClientTCP implements Runnable {
         count_list = res[8];
 
         fe.getAccueil().info.setText("<html>Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]+":</html>");
-        first_player = true;
-        //send = "";
-        //ICI Actualiser l'interface graphique
     }
 
     public void resPlayr(byte[] res, int len) {
@@ -479,20 +464,10 @@ public class ClientTCP implements Runnable {
         String nom = new String(res, 6, 8);
         
         String base = fe.getAccueil().info.getText().substring(0,fe.getAccueil().info.getText().length()-7);
-        if(first_player){
-            first_player = false;
-            fe.getAccueil().info.setText(base+" "+nom+"</html>");
-        }else{
-            fe.getAccueil().info.setText(base+", "+nom+"</html>");
-            // fe.pack();
-        } 
-        
-
-        //Ajouter le nom dans une liste
+        fe.getAccueil().info.setText(base+"<br>"+nom+"</html>");        
         System.out.println("\t" + nom);
         count_list--;
         if(count_list == 0) {
-            //ICI Actualiser l'interface graphique
             System.out.println("J'ai reçu tout les PLAYR");
         }
     }
@@ -562,7 +537,6 @@ public class ClientTCP implements Runnable {
         int p = Integer.parseInt(new String(res, 14, 4));
 
         fe.setPosJoueur(x,y);
-        //TODO: Mettre à jour l'interface graphique
     }
 
 
@@ -605,7 +579,6 @@ public class ClientTCP implements Runnable {
         int y = Integer.parseInt(new String(res,19,3));
         int p = Integer.parseInt(new String(res,23,4));
 
-        //TODO: Mettre à jour l'interface
         fe.drawPlayers(x, y);
         fe.add_player(id,p);
     }
