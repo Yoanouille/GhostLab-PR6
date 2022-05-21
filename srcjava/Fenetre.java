@@ -36,7 +36,7 @@ public class Fenetre extends JFrame {
         this.port = port;
         //c.setFenetre(this);
         //this.client = c;
-        this.setSize(800, 520);
+        this.setSize(900, 550);
         this.setTitle("Ghost Lab");
         this.setVisible(true);
         // this.setResizable(false);

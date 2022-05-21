@@ -66,6 +66,15 @@ public class MenuPartie extends JPanel {
     public MenuPartie(Fenetre fe,int width, int height){
         this.fenetre = fe;
         data = new int[width] [height];
+
+        if(height >= width) {
+            double ratio = width * 1.0 / height;
+            fe.setSize((int)(fe.getHeight() * ratio * 2), fe.getHeight());
+        } else {
+            double ratio = width * 1.0 / height;
+            fe.setSize(fe.getWidth(), (int)(fe.getWidth() / (ratio * 2)));
+        }
+
         GridLayout gridLayout = new GridLayout(1,2);
 
         this.setLayout(gridLayout);
@@ -528,11 +537,19 @@ public class MenuPartie extends JPanel {
                             if (i == y && j == x){
                                 g.setColor(Color.BLUE);
                                 g.fillRect(y * width / data.length + 1, x * height / data[y].length + 1, width / data.length -2, height / data[y].length -2);
+                                g.setColor(new Color(0,0,0,150));
+                                int sclW = (width)/ data.length;
+                                int sclH = (height) / data[i].length;
+                                g.fillRect(i * sclW + sclW / 4, j * sclH + sclH / 4, sclW / 2, sclH / 2);
+                            } else {
+                                g.setColor(Color.white);
+                                g.fillRect(i * width / data.length + 1, j * height / data[i].length + 1, width / data.length -2, height / data[i].length -2);
+                                g.setColor(Color.BLACK);
+                                int sclW = (width)/ data.length;
+                                int sclH = (height) / data[i].length;
+                                g.fillRect(i * sclW + sclW / 4, j * sclH + sclH / 4, sclW / 2, sclH / 2);
                             }
-                            g.setColor(new Color(0,0,0,150));
-                            int sclW = (width)/ data.length;
-                            int sclH = (height) / data[i].length;
-                            g.fillRect(i * sclW + sclW / 4, j * sclH + sclH / 4, sclW / 2, sclH / 2);  
+      
                         }
                     }
                 } 
