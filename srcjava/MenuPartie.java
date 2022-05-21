@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.BoxLayout;
 import java.awt.event.ActionEvent;
@@ -150,11 +151,14 @@ public class MenuPartie extends JPanel {
         d_cross.add(down);
         d_cross.add(right);
 
+
         cross.add(up);
         cross.add(d_cross);
         cross.add(nextMove);
         cross.add(move);
+        cross.setBorder(new EmptyBorder(50, 10, 10, 10));
         rightPane.add(cross,BorderLayout.CENTER);
+        
 
 
         //CHAT-----------------------------------------------------------------
