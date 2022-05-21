@@ -6,6 +6,8 @@ import javax.swing.SwingConstants;
 
 import java.awt.*;
 
+
+//Classe representant la premiere scene affichee
 public class Start extends JPanel {
     private Fenetre fe;
 
@@ -28,6 +30,8 @@ public class Start extends JPanel {
         c.gridx = 0;
         c.gridy = 0;
         c.insets = new Insets(10,10,10,10);
+
+        //Ce bouton lance fe.start() qui active la connexion
         BetterButton start = new BetterButton("Start");
         bottom.add(start, c);
         start.addActionListener((e) -> {

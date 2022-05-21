@@ -31,18 +31,21 @@ import java.util.LinkedList;
 import java.awt.*;
 import javax.swing.*;
 
-
+//Classe ou le jeu est afficher et le menu permettant les deplacements et la communication entre les joueurs
 public class MenuPartie extends JPanel {
 
+    //liste des deplacements pour l'affichage correct des murs
     private LinkedList<Integer> queueMovelen = new LinkedList<Integer>();
     private LinkedList<Integer> queueMoveDir = new LinkedList<Integer>();
     
+    //liste des joueurs dans la partie
     public DefaultListModel<String> players = new DefaultListModel<String>();
     private JList<String> player_list = new JList<String>(players);
 
     public JLabel historic = new JLabel("<html></html>");
     private JScrollPane historic_ScrollPane = new JScrollPane(historic);
 
+    //liste des objets temporaire à dessiner (fantome et joueur)
     private HashSet<PosOp> setOfDraw = new HashSet<>();
     
     private String my_id;
@@ -53,6 +56,7 @@ public class MenuPartie extends JPanel {
 
     private boolean isRunning = true;
 
+    //plateau du jeu
     private int [] [] data;
 
     private int x = -1;
@@ -305,6 +309,7 @@ public class MenuPartie extends JPanel {
         });
     }
 
+    //fonction qui permet l'acutalisation du score d'un joueur
     public void setScore(String id, int score){
        for(int i = 0; i < players.size();i++){
            if(id.equals(players.getElementAt(i).substring(0, 8))){
@@ -313,10 +318,12 @@ public class MenuPartie extends JPanel {
        }
     }
 
+    //fonction qui stop l'acutalisation du Thread qui dessine le jeu
     public void stop() {
         isRunning = false;
     }
 
+    //fonction qui ajoute un element temporaire a dessiner(fantome ou joueur)
     public void addPosToDraw(int x, int y, String type) {
         synchronized(setOfDraw) {
             if(type.equals("ghost")) {
@@ -329,12 +336,14 @@ public class MenuPartie extends JPanel {
         }
     }
 
+    //fonction qui ajoute un piege aux coordonees idiquee
     public void addTrap(int x, int y) {
         synchronized(data) {
             data[y][x] = 3;
         }
     }
 
+    //fonction qui demande l'envoie du message SEND? 
     private void send_to_player(JTextField text){
         if(player_list.getSelectedValue() != null){
             String g = player_list.getSelectedValue();
@@ -347,6 +356,7 @@ public class MenuPartie extends JPanel {
         }
     }
 
+    //fonction qui demande l'envoie du message MALL?
     private void send_to_all(JTextField text){
         try {
             fenetre.getClient().reqMall(text.getText());
@@ -355,6 +365,7 @@ public class MenuPartie extends JPanel {
         }
     }
 
+    //focntion qui demande l'envoie du message GLIS?
     private void refresh(){
         try {
             fenetre.getClient().reqGlis();
@@ -363,6 +374,7 @@ public class MenuPartie extends JPanel {
         }
     }
 
+    //fonction qui permet d'afficher les fleches et de repeter plusiseurs foix la meme
     private void nextMove(String s,JLabel label){
         if(label.getText().contains(s)){
             label.setText(label.getText() + s);
@@ -372,6 +384,8 @@ public class MenuPartie extends JPanel {
         
     }
     
+    //fonction qui demande l'envoie du message de type **MOV, 
+    // determine quel type de **MOV envoyer et sauvegarde la direction 
     private void move(JLabel nextMove){
         int dir;
         switch (nextMove.getText().charAt(0)) {
@@ -404,6 +418,9 @@ public class MenuPartie extends JPanel {
         }      
     }
 
+
+    //fonction qui permet de deplacer le joueur a la bonne case dans le plateau
+    // et change les cases parcourues en case libre et s'il y a eu collision ajoute un mur dans le plateau
     public void setJoueur(int x, int y){
         if(this.x == -1 && this.y == -1){
             data[y][x] = 1;
@@ -446,16 +463,18 @@ public class MenuPartie extends JPanel {
         //plateau.repaint();
     }
 
+    //fonction pour changer l'id
     public void setId(String id){
         this.my_id = id;
     }
 
+    //fonction pour changer le score
     public void setMyScore(int score){
         setScore(my_id,score);
     }
     
 
-
+    //classe interne pour dessiner le plateau de jeu
     private class PanneauJeu extends JPanel {
     
         
@@ -463,6 +482,8 @@ public class MenuPartie extends JPanel {
             super();
         }
 
+        //Fonction qui peint le plateau en fonction des cases du plateau et des elements
+        // temporaires dans setOfDraw (elle est appelee dans le thread d'actualisation de l'interface)
         @Override
         public void paintComponent(final Graphics g) {
 
@@ -471,6 +492,7 @@ public class MenuPartie extends JPanel {
             int width = getWidth();
             int height = getHeight();
 
+            //dessin du plateau
             for (int i = 0; i < data.length; i++) {
                 for (int j = 0; j < data[i].length; j++) {
 
@@ -516,6 +538,7 @@ public class MenuPartie extends JPanel {
                 } 
             }
 
+            //dessin des elements temporaire
             synchronized(setOfDraw) {
                 LinkedList<PosOp> elt_rm = new LinkedList<>();
                 for(PosOp p : setOfDraw) {
@@ -538,6 +561,8 @@ public class MenuPartie extends JPanel {
         }
 
     }
+
+    //classe interne pour limiter le nombre caracteres maximum du chat et empecher les + et les * dans le message
     private class JTextFieldLimit extends PlainDocument {
         private int limit;
         // optional uppercase conversion

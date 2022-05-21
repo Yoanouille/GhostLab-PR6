@@ -24,14 +24,13 @@ public class Accueil extends JPanel{
 
     private JScrollPane rightPane_ScrollPane = new JScrollPane(rightPane,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+    //liste des parties
     public DefaultListModel<String> games = new DefaultListModel<String>();
-
     private JList<String> games_list = new JList<String>(games);
 
     public JTextField id = new JTextField();
 
     private BetterButton create_game = new BetterButton("Create a new Game");
-    
 
     private BetterButton register = new BetterButton("Register");
 
