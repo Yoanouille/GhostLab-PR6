@@ -370,6 +370,7 @@ int move(char *mess, player *p, game *g, int dir) {
 
     if(end){ //ENVOYER MESSAGE END
         send_end(p->his_game);
+        p->his_game->finished = 1;
     }
     return re;
 }

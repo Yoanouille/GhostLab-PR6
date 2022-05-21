@@ -14,6 +14,7 @@ void *ghost_thread(void *arg) {
         pthread_mutex_lock(&lock);
         if(g == NULL || g->finished || all_catched(g->ghosts, g->nb_ghost)) {
             printf("Fin thread fantome\n");
+            g->finished = 1;
             pthread_mutex_unlock(&lock);
             break;
         }
@@ -33,7 +34,11 @@ void *ghost_thread(void *arg) {
 //Traite la requête TCP
 int traitement (player *p,char* mess,int* running, int len){
     printf("%s\n", mess);
-    if(strncmp(mess,"NEWPL",5) == 0){
+    if(p->his_game != NULL && p->his_game->finished) {
+        char message[] = "GOBYE***";
+        mySend(p->sock,message,8);
+        return EXIT_FAILURE;
+    } else if(strncmp(mess,"NEWPL",5) == 0){
         pthread_mutex_lock(&lock);
         int r = req_newPl(p, mess, &g_list);
         pthread_mutex_unlock(&lock);
@@ -129,16 +134,9 @@ int traitement (player *p,char* mess,int* running, int len){
         return r;
     }
     else {
-        if(p->his_game->finished) {
-            char message[] = "GOBYE***";
-            int r = mySend(p->sock,message,8);
-            return r;
-        }
-        else {
-            char message[] = "DUNNO***";
-            int r = mySend(p->sock,message,8);
-            return r;
-        }
+        char message[] = "DUNNO***";
+        int r = mySend(p->sock,message,8);
+        return r;
     }
     return EXIT_FAILURE;
 }
