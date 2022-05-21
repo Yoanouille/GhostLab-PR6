@@ -164,9 +164,9 @@ void place_ghost(ghost *g, int len, lab *l, player_list *lp) {
         int x = 0;
         int y = 0;
         do {
-            x = rand() % (l->w);
-            y = rand() % (l->h);
-        } while(l->tab[y][x] == 0 || is_on_player(lp, x, y) || is_on_ghost_not_catched(g, len, x, y));
+            x = rand() % (l->h);
+            y = rand() % (l->w);
+        } while(l->tab[x][y] == 0 || is_on_player(lp, x, y) || is_on_ghost_not_catched(g, len, x, y));
         g[i].x = x;
         g[i].y = y;
     }

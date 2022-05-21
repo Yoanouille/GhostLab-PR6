@@ -215,6 +215,7 @@ int init_game(game *g) {
 
     g->sock_udp  = sock;
     init_ghost(g->ghosts, g->nb_ghost, g->lab, g->players);
+    print_lab_2(g->lab);
 
     //Initialisation Welcome
     char welcome[] = "WELCO m hh ww f 225.1.2.4###### port***";
@@ -235,9 +236,9 @@ int init_joueur(player_list *p, lab *l, ghost *g,char *welcome) {
     int x = 0;
     int y = 0;
     do {
-        x = rand() % (l->w);
-        y = rand() % (l->h);
-    } while(l->tab[y][x] == 0 || is_on_ghost_not_catched(g, p->p->his_game->nb_ghost, x, y));
+        x = rand() % (l->h);
+        y = rand() % (l->w);
+    } while(l->tab[x][y] == 0 || is_on_ghost_not_catched(g, p->p->his_game->nb_ghost, x, y));
 
     p->p->x = x;
     p->p->y = y;
@@ -312,20 +313,20 @@ int move(char *mess, player *p, game *g, int dir) {
     int dy = 0;
     switch(dir) {
         case 0 : 
-            dx = 0;
-            dy = -1;
-            break;
-        case 1 : 
-            dx = 0;
-            dy = 1;
-            break;
-        case 2 :
             dx = -1;
             dy = 0;
             break;
-        case 3 :
+        case 1 : 
             dx = 1;
             dy = 0;
+            break;
+        case 2 :
+            dx = 0;
+            dy = -1;
+            break;
+        case 3 :
+            dx = 0;
+            dy = 1;
             break;
     }
     int bool_score = 0;
@@ -333,8 +334,8 @@ int move(char *mess, player *p, game *g, int dir) {
     for(int i = 0; i < d; i++) {
         bool_score = 0;
         bool_trap = 0;
-        if(p->y + dy < 0 || p->y+dy >= g->lab->h || p->x+dx <0 ||  p->x+dx >= g->lab->w) break;
-        if(g->lab->tab[p->y + dy][p->x + dx] == 0) break;
+        if(p->y + dy < 0 || p->y+dy >= g->lab->w || p->x+dx <0 ||  p->x+dx >= g->lab->h) break;
+        if(g->lab->tab[p->x + dx] [p->y + dy]== 0) break;
         if(is_on_ghost(g->ghosts, g->nb_ghost, p->x + dx, p->y + dy)){
             score += 100;
             bool_score = 1;
@@ -343,7 +344,7 @@ int move(char *mess, player *p, game *g, int dir) {
                 end = 1;
             }
         } 
-        if(g->lab->tab[p->y + dy][p->x + dx] == 2) {
+        if(g->lab->tab[p->x + dx][p->y + dy] == 2) {
             score -= 20;
             bool_trap = 1;   
         }

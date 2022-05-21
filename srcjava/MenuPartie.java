@@ -331,7 +331,7 @@ public class MenuPartie extends JPanel {
 
     public void addTrap(int x, int y) {
         synchronized(data) {
-            data[x][y] = 3;
+            data[y][x] = 3;
         }
     }
 
@@ -414,30 +414,30 @@ public class MenuPartie extends JPanel {
             int dir = queueMoveDir.pop();
             switch(dir) {
                 case 0 : 
-                    dx = 0;
-                    dy = -1;
-                    break;
-                case 1 : 
-                    dx = 0;
-                    dy = 1;
-                    break;
-                case 2 :
                     dx = -1;
                     dy = 0;
                     break;
-                case 3 :
+                case 1 : 
                     dx = 1;
                     dy = 0;
+                    break;
+                case 2 :
+                    dx = 0;
+                    dy = -1;
+                    break;
+                case 3 :
+                    dx = 0;
+                    dy = 1;
                     break;
             }
             
             synchronized(data) {
                 for(int i = 0; i < len; i++){
-                    if(data[this.x + (i*dx)][this.y + (i*dy)] == 0) data[this.x+(i*dx)][this.y+(i*dy)] = 1;
+                    if(data[this.y + (i*dy)][this.x + (i*dx)]== 0) data[this.y+(i*dy)][this.x+(i*dx)] = 1;
                 }
                 if (len < queueMovelen.pop()){
-                    if(this.x+(len+1)*dx >= 0 && this.x+(len+1)*dx < data.length && this.y+(len+1)*dy >= 0 && this.y+(len+1)*dy < data[x].length)
-                    data[this.x+(len+1)*dx][this.y+(len+1)*dy]=2;
+                    if(this.x+(len+1)*dx >= 0 && this.x+(len+1)*dx < data[y].length && this.y+(len+1)*dy >= 0 && this.y+(len+1)*dy < data.length)
+                    data[this.y+(len+1)*dy][this.x+(len+1)*dx]=2;
                 }
             }
         }
@@ -494,23 +494,23 @@ public class MenuPartie extends JPanel {
                     }
 
                     if(currentCase != 3) {
-                        if (i == x && j == y){
+                        if (i == y && j == x){
                             g.setColor(Color.BLUE);
-                            g.fillRect(x * width / data.length + 1, y * height / data[x].length + 1, width / data.length -2, height / data[x].length -2);
+                            g.fillRect(y * width / data.length + 1, x * height / data[y].length + 1, width / data.length -2, height / data[y].length -2);
                         }else {
                             g.setColor(c);
                             g.fillRect(i * width / data.length + 1, j * height / data[i].length + 1, width / data.length -2, height / data[i].length -2);
                         }
                     }else{ 
                         if(currentCase == 3){
-                            if (i == x && j == y){
+                            if (i == y && j == x){
                                 g.setColor(Color.BLUE);
-                                g.fillRect(x * width / data.length + 1, y * height / data[x].length + 1, width / data.length -2, height / data[x].length -2);
+                                g.fillRect(y * width / data.length + 1, x * height / data[y].length + 1, width / data.length -2, height / data[y].length -2);
                             }
                             g.setColor(new Color(0,0,0,150));
-                            int sclX = (width)/ data.length;
-                            int sclY = (height) / data[i].length;
-                            g.fillRect(i * sclX + sclX / 4, j * sclY + sclY / 4, sclX / 2, sclY / 2);  
+                            int sclW = (width)/ data.length;
+                            int sclH = (height) / data[i].length;
+                            g.fillRect(i * sclW + sclW / 4, j * sclH + sclH / 4, sclW / 2, sclH / 2);  
                         }
                     }
                 } 
@@ -521,13 +521,13 @@ public class MenuPartie extends JPanel {
                 for(PosOp p : setOfDraw) {
                     Color c = p.getC();
                     g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), p.getOpacity()));
-                    g.fillRect(p.getX() * width / data.length + 3, p.getY() *  height / data[p.getX()].length + 3 , width / data.length - 6, height / data[x].length - 6);
+                    g.fillRect(p.getY() * width / data.length + 3, p.getX() *  height / data[p.getY()].length + 3 , width / data.length - 6, height / data[p.getY()].length - 6);
                     if(p.reduceOp()) elt_rm.add(p);
-                    if(data[p.getX()][p.getY()] == 3 ){
+                    if(data[p.getY()][p.getX()] == 3 ){
                         g.setColor(new Color(0,0,0,150));
-                        int sclX = (width)/ data.length;
-                        int sclY = (height) / data[p.getX()].length;
-                        g.fillRect(p.getX() * sclX + sclX / 4, p.getY() * sclY + sclY / 4, sclX / 2, sclY / 2);
+                        int sclW = (width)/ data.length;
+                        int sclH = (height) / data[p.getY()].length;
+                        g.fillRect(p.getY() * sclW + sclW / 4, p.getX()* sclH + sclH / 4, sclW / 2, sclH / 2);  
                     }
 
                 }
