@@ -406,7 +406,7 @@ public class MenuPartie extends JPanel {
 
     public void setJoueur(int x, int y){
         if(this.x == -1 && this.y == -1){
-            data[x][y] = 1;
+            data[y][x] = 1;
         }else {
             int len = Math.abs(this.x - x + this.y - y);
             int dx = 0;
