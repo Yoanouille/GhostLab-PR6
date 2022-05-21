@@ -21,9 +21,11 @@ public class ClientMulti implements Runnable {
             else break;
         }
         System.out.println(newIp);
+        //on abonne la socket à l'adresse de multi-diffusion
         socket.joinGroup(InetAddress.getByName(newIp));
     }
 
+    //Fonction du thread qui recoit les messages udp multi-diffuse
     @Override
     public void run() {
         while(isRunning) {
@@ -41,6 +43,7 @@ public class ClientMulti implements Runnable {
         System.out.println("FIN MULTI");   
     }
 
+    //parseur des messages UDP recut
     public void parseMess(DatagramPacket packet) {
         byte[] res = packet.getData();
         int len = packet.getLength();
@@ -66,6 +69,7 @@ public class ClientMulti implements Runnable {
         }
     }
 
+    //fonction qui parse le message Ghost et actualise l'interface
     public void resGhost(byte[] res, int len) {
         if(len != 16) {
             System.out.println("Error len recv multi GHOST");
@@ -77,6 +81,7 @@ public class ClientMulti implements Runnable {
         fe.drawGhost(x, y);
     }
 
+    //fonction qui parse le message Score et actualise l'interface
     public void resScore(byte[] res, int len) {
         if(len != 30) {
             System.out.println("Error len recv multi SCORE");
@@ -90,6 +95,7 @@ public class ClientMulti implements Runnable {
         fe.set_player_score(id,p);
     }
 
+    //fonction qui parse le message MESSA et actualise l'interface
     public void resMessa(byte[] res, int len) {
         String id = new String(res, 6, 8);
         String mess = new String(res, 15, len - 15);
@@ -99,6 +105,7 @@ public class ClientMulti implements Runnable {
         fe.add_message(id, mess);
     }
 
+    //fonction qui parse le message ENDGA et actualise l'interface
     public void resEndGame(byte[] res, int len) {
         if(len != 22) {
             System.out.println("Error len recv multi ENDGA");
@@ -116,6 +123,7 @@ public class ClientMulti implements Runnable {
         fe.stopUdp();
     }
 
+    //focntion pour arreter la boucle while du run
     public void stop(){
         this.isRunning = false;
     }

@@ -11,6 +11,7 @@ import java.awt.Component;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 
+//Classe principale de l'interface graphique
 public class Fenetre extends JFrame {
     private InetAddress ip;
     private int port;
@@ -27,6 +28,7 @@ public class Fenetre extends JFrame {
 
     private MenuPartie jeu;
 
+    //Constructueur qui permet la création du JFrame et des scene associe
     public Fenetre(InetAddress ip, int port) {
         super();
 
@@ -57,6 +59,7 @@ public class Fenetre extends JFrame {
         setScene("start");
     }
 
+    //Fonction qui creer un MenuPartie avec les tailles donne par le message WELCO et affiche la scene
     public void initJeu(int w, int h){
         jeu = new MenuPartie(this,w,h);
         mainPanel.add("jeu",jeu);
@@ -67,6 +70,7 @@ public class Fenetre extends JFrame {
         jeu.setId(acc.id.getText());
     }
 
+    //Fonction pour demarrer la connexion en creant le client TCP et afficher l'accueil
     public void start() {
         try {
             client = new ClientTCP(ip, port, this);
@@ -80,23 +84,28 @@ public class Fenetre extends JFrame {
         }
     }
 
+    //Fonction pour dessiner le joueur a la bonne position
     public void setPosJoueur(int x,int y){
         jeu.setJoueur(x,y);
     }
 
+    //fonction pour afficher la scene desiree
     public void setScene(String scene) {
         cardLayout.show(mainPanel, scene);
         mainPanel.updateUI();
     }
 
+    //getter qui retourne le clientTCP
     public ClientTCP getClient(){
         return client;
     }
 
+    //getter qui retourne l'accueil
     public Accueil getAccueil(){
         return this.acc;
     }
 
+    //fonction pour enlever les parties presentes dans la liste contenue dans accueil
     public void reset_games(){
         Runnable run=new Runnable(){
             public void run(){
@@ -106,6 +115,7 @@ public class Fenetre extends JFrame {
         SwingUtilities.invokeLater(run);
     }
 
+    //fonction pour ajouter une partie dans la liste des parties de accueil
     public void add_game(int ngame, int nplayer){
         Runnable run=new Runnable(){
             public void run(){
@@ -120,6 +130,8 @@ public class Fenetre extends JFrame {
             e.printStackTrace();
         }
     }
+
+    //Fonction pour changer le score d'un joueur dans MenuPartie
     public void set_player_score(String id, int p){
         Runnable run=new Runnable(){
             public void run(){
@@ -129,6 +141,7 @@ public class Fenetre extends JFrame {
         SwingUtilities.invokeLater(run);
     }
 
+    //Fonction pour changer le score du joueur dans MenuPartie
     public void set_my_score(int p){
         Runnable run=new Runnable(){
             public void run(){
@@ -138,6 +151,7 @@ public class Fenetre extends JFrame {
         SwingUtilities.invokeLater(run);
     }
 
+    //fonction pour enlever les joueurs presents dans la liste contenue dans MenuPartie
     public void reset_players(){
         Runnable run=new Runnable(){
             public void run(){
@@ -147,6 +161,7 @@ public class Fenetre extends JFrame {
         SwingUtilities.invokeLater(run);
     }
 
+    //fonction pour ajouter un joeuur dans la liste des joueur de MenuPartie
     public void add_player(String id, int score){
         Runnable run=new Runnable(){
             public void run(){
@@ -162,30 +177,37 @@ public class Fenetre extends JFrame {
         }
     }
 
+    //fonction pour ajouter un message dans le chat de MenuPartie
     public void add_message(String id, String msg){
         jeu.historic.setText(jeu.historic.getText().substring(0,jeu.historic.getText().length()-7)+"<br>"+id+": "+msg+"</html>");
     }
 
+    //fonction pour ajouter un message personnel dans le chat de MenuPartie
     public void add_messageP(String id, String msg){
         jeu.historic.setText(jeu.historic.getText().substring(0,jeu.historic.getText().length()-7)+"<br><font color='red'>"+id+"(to you)"+msg+"</font></html>");
     }
 
+    //fonction pour dessiner un fantome dans MenuPartie
     public void drawGhost(int x, int y) {
         jeu.addPosToDraw(x, y, "ghost");
     }
 
+    //Fonction pour dessiner les joueurs dans MenuPartie
     public void drawPlayers(int x, int y) {
         jeu.addPosToDraw(x, y, "player");
     }
 
+    //Fonction pour ajouter un piege dans le plateau de MenuPartie
     public void addTrap(int x, int y) {
         jeu.addTrap(x, y);
     }
 
+    //Fonction pour stopper le clientUDP
     public void stopUdp() {
         client.stopUDP();
     }
 
+    //Fonction pour demandé l'envoie du message IQUIT
     public void sendQuit() {
         try {
             client.reqQuit();
@@ -195,11 +217,13 @@ public class Fenetre extends JFrame {
         }
     }
 
+    //Fonction pour choisir le message affiche sur la scene setEnd
     public void setEnd(String end) {
         mainPanel.add("end",new EndScreen(this, end));
         setScene("end");
     }
 
+    //fonction pour mettre l'id du joueur dans MenuPartie
     public void setJeuId(String id){
         jeu.setId(id);
     } 

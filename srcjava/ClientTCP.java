@@ -14,7 +14,7 @@ public class ClientTCP implements Runnable {
     private ClientUDP cUdp;
     private ClientMulti cMulti;
 
-    //private String send = "GAME?";
+    //permet de savoir si on a bien recut le bon nombre de message
     private int count_ogame = 0;
     private int count_list = 0;
     private int count_glis = 0;
@@ -25,15 +25,18 @@ public class ClientTCP implements Runnable {
         cUdp = new ClientUDP(fe);
         new Thread(cUdp).start();
     }
-
+    
+    //simple setter
     public void setFenetre(Fenetre fe) {
         this.fe = fe;
     }
 
+    //fonction pour stoper clientUDP
     public void stopUDP() {
         cUdp.stop();
     }
 
+    //fonction qui recoit les messages tcp et les parse pour ensuite les traiter
     @Override
     public void run() {
         running = true;
@@ -74,12 +77,14 @@ public class ClientTCP implements Runnable {
         }
     }
 
+    //fonction qui permet de remplir un tableau de byte avec une string en partant de begin
     public void fill(byte[] data, int begin, String s) {
         for(int i = begin; i < data.length && i < begin + s.length(); i++) {
             data[i] = (byte) s.charAt(i - begin);
         }
     }
 
+    //affiche un byte
     public void print_byte(byte[] req, int len) {
         for(int i = 0; i < len; i++) {
             System.out.print(req[i]);
@@ -87,24 +92,28 @@ public class ClientTCP implements Runnable {
         System.out.println();
     }
 
+    //fonction d'erreur
     public void errorOgame() {
         if(count_ogame != 0) {
             System.out.println("Error didn't receive the rigth number of OGAME");
         }
     }
 
+    //fonction d'erreur
     public void errorPlayr() {
         if(count_list != 0) {
             System.out.println("Error didn't receive the right number of PLAYR");
         }
     }
 
+    //fonction d'erreur
     public void errorGlis() {
         if(count_glis != 0) {
             System.out.println("Error didn't receive the right number of GPLYR");
         }
     }
 
+    //fonction qui une fois le messages TCP recut en entier va permettre d'appeler la bonne fonction de reception
     public void parseReq(byte[] res, int len) {
         String begin = new String(res, 0, 5);
         System.out.println(new String(res,0,len));
@@ -261,7 +270,7 @@ public class ClientTCP implements Runnable {
         }       
     }
 
-
+    //Fonction qui envoie le message NEWPL
     public void reqNewPL(String id) throws IOException {
         //send = "NEWPL";
         byte[] data = ("NEWPL "+id+" "+Integer.toString(cUdp.getPort())+"***").getBytes();
@@ -270,6 +279,7 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
+    //Fonction qui envoie le message REGIS
     public void reqRegis(String id, int game) throws IOException {
         //send = "REGIS";
         byte[] data = new byte[5 + 1 + 8 + 1 + 4 + 1 + 1 + 3];
@@ -283,7 +293,7 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
-
+    //Fonction qui envoie le message START
     public void reqStart() throws IOException {
         //send = "START";
         byte[] data = new byte[5 + 3];
@@ -292,6 +302,7 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
+    //Fonction qui envoie le message UNREG
     public void reqUnReg() throws IOException {
         //send = "UNREG";
         byte[] data = new byte[5 + 3];
@@ -300,6 +311,7 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
+    //Fonction qui envoie le message SIZE?
     public void reqSize(int m) throws IOException {
         //send = "SIZE?";
         byte[] data = new byte[10];
@@ -310,6 +322,7 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
+    //Fonction qui envoie le message LIST?
     public void reqList(int m) throws IOException {
         //send = "LIST?";
         byte[] data = new byte[10];
@@ -320,6 +333,7 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
+    //Fonction qui envoie le message GAME?
     public void reqGame() throws IOException {
         //send = "GAME?";
         byte[] data = "GAME?***".getBytes();
@@ -327,6 +341,8 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
+
+    //Fonction qui envoie le message **MOV
     //DIR 0 -> UP | 1 -> DOWN | 2 -> LEFT | 3 -> RIGHT
     public void reqMov(int dir, int len) throws IOException {
         String mess = "";
@@ -344,18 +360,21 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
+    //Fonction qui envoie le message IQUIT
     public void reqQuit() throws IOException {
         byte[] data = "IQUIT***".getBytes();
         socket.getOutputStream().write(data);
         socket.getOutputStream().flush();
     }
 
+    //Fonction qui envoie le message GLIS?
     public void reqGlis() throws IOException {
         byte[] data = "GLIS?***".getBytes();
         socket.getOutputStream().write(data);
         socket.getOutputStream().flush();
     }
 
+    //Fonction qui envoie le message MALL?
     public void reqMall(String mess) throws IOException {
         String req = "MALL? " + mess + "***";
         byte[] data = req.getBytes();
@@ -363,6 +382,7 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
+    //Fonction qui envoie le message SEND?
     public void reqSend(String id, String mess) throws IOException {
         String req = "SEND? " + id + " " + mess + "***";
         byte[] data = req.getBytes();
@@ -370,7 +390,7 @@ public class ClientTCP implements Runnable {
         socket.getOutputStream().flush();
     }
 
-
+    //Fonction qui parse le message GAMES et actualise l'interface 
     public void resGame(byte[] res, int len) {
         if(len != 10) {
             System.out.println("Error len recv GAMES");
@@ -381,6 +401,7 @@ public class ClientTCP implements Runnable {
         System.out.println("Je vais recevoir " + res[6] + " messages OGAME !");
     }
 
+    //Fonction qui parse le message OGAME et actualise l'interface
     public void resOgame(byte[] res, int len) {
         if(len != 12) {
             System.out.println("Error len recv OGAME");
@@ -394,6 +415,7 @@ public class ClientTCP implements Runnable {
         }
     }
 
+    //Fonction du message REGOK et actualise l'interface
     public void resRegOK(byte[] res, int len) {
         if(len != 10) {
             System.out.println("Error len recv REGOK");
@@ -404,6 +426,7 @@ public class ClientTCP implements Runnable {
         fe.getAccueil().reg = true;
     }
 
+    //Fonction du message REGNO et actualise l'interface
     public void resRegNO(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv REGNO");
@@ -413,6 +436,8 @@ public class ClientTCP implements Runnable {
         fe.getAccueil().info.setText("Vous pouvez pas vous y incrire !");
     }
 
+
+    //Fonction du message UNROK et actualise l'interface
     public void resUnRegOK(byte[] res, int len) {
         if(len != 10) {
             System.out.println("Error len recv UNROK");
@@ -423,6 +448,7 @@ public class ClientTCP implements Runnable {
         fe.getAccueil().info.setText("Vous vous êtes bien désinscrit de la partie " + res[6]);
     }
 
+    //Fonction du message DUNNO et actualise l'interface
     public void resDUNNO(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv DUNNO");
@@ -432,6 +458,7 @@ public class ClientTCP implements Runnable {
         fe.getAccueil().info.setText("IMPOSSIBLE !");
     }
 
+    //Fonction qui parse le message SIZE! et actualise l'interface
     public void resSize(byte[] res, int len) {
         if(len != 16) {
             System.out.println("Error len recv SIZE");
@@ -445,6 +472,7 @@ public class ClientTCP implements Runnable {
 
     }
 
+    //Fonction qui parse le message LIST! et actualise l'interface
     public void resList(byte[] res, int len) {
         if(len != 12) {
             System.out.println("Error len recv LIST");
@@ -456,6 +484,7 @@ public class ClientTCP implements Runnable {
         fe.getAccueil().info.setText("<html>Il y a " + res[8] + " joueur(s) dans la Partie " + res[6]+":</html>");
     }
 
+    //Fonction qui parse le message PLAYR et actualise l'interface
     public void resPlayr(byte[] res, int len) {
         if(len != 17) {
             System.out.println("Error len recv PLAYR");
@@ -472,6 +501,7 @@ public class ClientTCP implements Runnable {
         }
     }
 
+    //Fonction qui parse le message WELCO et actualise l'interface
     public void resWelco(byte[] res, int len) {
         if(len != 39) {
             System.out.println("Error len recv WELCO");
@@ -500,6 +530,8 @@ public class ClientTCP implements Runnable {
         fe.initJeu(w,h);
     }
 
+
+    //Fonction qui parse le message POSIT et actualise l'interface
     public void resPosit(byte[] res, int len) {
         if(len != 25) {
             System.out.println("Error len recv POSIT");
@@ -513,7 +545,7 @@ public class ClientTCP implements Runnable {
         fe.setPosJoueur(x, y);
     }
 
-
+    //Fonction qui parse le message MOVE! et actualise l'interface
     public void resMove(byte[] res, int len) {
         if(len != 16) {
             System.out.println("Error len recv MOVE!");
@@ -526,6 +558,7 @@ public class ClientTCP implements Runnable {
         fe.setPosJoueur(x,y);
     }
 
+    //Fonction qui parse le message MOVEF et actualise l'interface
     public void resMoveF(byte[] res, int len) {
         if(len != 21) {
             System.out.println("Error len recv MOVE!");
@@ -539,7 +572,7 @@ public class ClientTCP implements Runnable {
         fe.setPosJoueur(x,y);
     }
 
-
+    //Fonction du message GOBYE et ferme la connection
     public void resGoodBye(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv GOBYE");
@@ -556,6 +589,7 @@ public class ClientTCP implements Runnable {
         cUdp.stop();
     }
 
+    //Fonction qui parse le message GLIS! et actualise l'interface
     public void resGlis(byte[] res, int len) {
         if(len != 10) {
             System.out.println("Error len recv GLIS!");
@@ -567,6 +601,7 @@ public class ClientTCP implements Runnable {
         fe.reset_players();
     }
 
+    //Fonction qui parse le message GPLYR et actualise l'interface
     public void resGplyr(byte[] res, int len) {
         if(len != 30) {
             System.out.println("Error len recv GPLYR");
@@ -583,6 +618,7 @@ public class ClientTCP implements Runnable {
         fe.add_player(id,p);
     }
 
+    //Fonction du message MALL!
     public void resMall(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv MALL!");
@@ -591,6 +627,7 @@ public class ClientTCP implements Runnable {
         System.out.println("Message bien envoyé à tous !");
     }
 
+    //Fonction du message SEND!
     public void resSend(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv SEND!");
@@ -599,6 +636,7 @@ public class ClientTCP implements Runnable {
         System.out.println("Message bien envoyé !");
     }
 
+    //Fonction du message NSEND
     public void resNSend(byte[] res, int len) {
         if(len != 8) {
             System.out.println("Error len recv NSEND");

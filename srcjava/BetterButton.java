@@ -9,6 +9,8 @@ import java.awt.event.MouseListener;
 import javax.swing.JButton;
 import javax.swing.plaf.DimensionUIResource;
 
+
+//Classe pour avoir de jolis boutons
 public class BetterButton extends JButton {
     public BetterButton(String text) {
         super(text);

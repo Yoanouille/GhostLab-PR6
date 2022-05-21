@@ -6,6 +6,7 @@ import javax.swing.SwingConstants;
 
 import java.awt.*;;
 
+//Classe qui represente l'ecran de fin de partie avec le score si la partie c'est finie
 public class EndScreen extends JPanel {
     public EndScreen(Fenetre fe, String te) {
         this.setLayout(new GridLayout(2,1));

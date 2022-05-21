@@ -49,6 +49,7 @@ public class Accueil extends JPanel{
 
     public Boolean reg = false;
 
+    //classe interne permettant de limiter à 8 le nombre de caractère pour le pseudo
     private class JTextFieldLimit extends PlainDocument {
         private int limit;
         // optional uppercase conversion
@@ -78,11 +79,12 @@ public class Accueil extends JPanel{
          }
       }
       
-
+    //Contructeur de accueil où l'on créer le visuel
     public Accueil(Fenetre f) {
         this.fenetre = f;
         this.setLayout(gridLayout);
        
+        //On attache aux boutons les fonctions correspondante
         create_game.addActionListener((ActionEvent e) -> {
             create_game();
         });
@@ -182,8 +184,8 @@ public class Accueil extends JPanel{
 
     }   
 
+    //Fonctions qui demande l'envoie de la requete de création de partie
     public void create_game() {
-        //definir le port
         if(!reg){
             if(id.getText().length() == 8){
                 try {
@@ -201,8 +203,8 @@ public class Accueil extends JPanel{
         }
     }
 
+    //fonction qui demande l'envoie de la requete d'enregistrement dans une partie
     public void register_to() {
-        //definir le port
         if(!reg){
             String g = games_list.getSelectedValue();
             String s[] = g.split(":");
@@ -225,6 +227,7 @@ public class Accueil extends JPanel{
         }
     }
 
+    //fonction qui demande d'envoyer la requete pour avoir la liste des joueurs dans une partie
     public void get_list(){
         String g = games_list.getSelectedValue();
         String s[] = g.split(":");
@@ -239,7 +242,7 @@ public class Accueil extends JPanel{
             e.printStackTrace();
         }
     }
-
+    //fonction qui demande l'envoie de la requete pour avoir la taille d'une partie
     public void get_size(){
         String g = games_list.getSelectedValue();
         String s[] = g.split(":");
@@ -255,6 +258,7 @@ public class Accueil extends JPanel{
         }
     }
 
+    //fonction qui demande l'envoie de la requete se desenregistrer
     public void unreg(){
         if(reg){
             try {
@@ -268,6 +272,7 @@ public class Accueil extends JPanel{
         }
     }
 
+    //fonction qui demande l'envoie de la requete start
     public void start(){
         if(reg){
             try{
@@ -281,6 +286,7 @@ public class Accueil extends JPanel{
         } 
     }
 
+    //fonction qui demande l'envoie de la requete pour avoir la liste des parties
     public void refresh(){
         try {
             fenetre.getClient().reqGame();
@@ -290,6 +296,8 @@ public class Accueil extends JPanel{
         this.info.setText("Nothing for now");
     }
 
+
+    //fonction qui vérifie si la chaîne ne contient que des caractères alpha-numerique
     public static boolean isAlphaNum(String str) {
         str = str.toLowerCase();
         for (int i = 0; i < str.length(); ++i) {

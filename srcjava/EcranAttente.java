@@ -4,6 +4,7 @@ package srcjava;
 import javax.swing.*;
 import java.awt.*;;
 
+//Classe qui represente un ecran d'accueil
 public class EcranAttente extends JPanel{
     private Fenetre fe;
 

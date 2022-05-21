@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+//CLasse qui gere le client UDP
 public class ClientUDP implements Runnable {
     private DatagramSocket socket;
     private boolean isRunning = true;
@@ -25,16 +26,19 @@ public class ClientUDP implements Runnable {
         System.out.println(port + " " + socket.getLocalPort());
     }
 
+    //getter qui retourne le port
     public int getPort() {
         return socket.getLocalPort();
     }
 
+    //fonction qui stop la connection UDP
     public void stop() {
         socket.close();
         System.out.println("J'essaie de fermer UDP");
         isRunning = false;
     }
     
+    //Fonction du thread qui recoit les messages udp
     @Override
     public void run() {
         while(isRunning) {
@@ -53,6 +57,7 @@ public class ClientUDP implements Runnable {
         System.out.println("FIN UDP");
     }
 
+    //parseur des messages UDP recut
     public void parseMess(DatagramPacket packet) {
         byte[] res = packet.getData();
         int len = packet.getLength();
@@ -74,6 +79,7 @@ public class ClientUDP implements Runnable {
         }
     }
 
+    //Fonction qui parse le message MESSP et actualise l'interface
     public void resMessp(byte[] res, int len) {
         String id = new String(res, 6, 8);
         String mess = new String(res, 15, len-15);
@@ -84,6 +90,7 @@ public class ClientUDP implements Runnable {
 
     }
 
+    //Fonction qui parse le message TRAP! et actualise l'interface
     public void resTrap(byte[] res, int len) {
         if(len != 21) {
             System.out.println("Error len rcv TRAP!");
