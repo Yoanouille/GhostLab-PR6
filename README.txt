@@ -45,8 +45,8 @@ $ ./server 6666
 ------------------------------
 
 $ make 
-$ java Main 127.0.0.1 6666 
-(lance un client qui va se connecter à un server local sur le port 6666)
+$ java Main lulu 6666 
+(lance un client qui va se connecter à un server qui est sur lancé sur machine lulu et dont ce serveur écoute sur le port 6666)
 
 
 ------------
@@ -68,9 +68,13 @@ Pour voir les autres joueurs appuyé sur actualisé et ils apparaitrons brièvem
 
 Les fantômes apparaissent à chacun de leur déplacment brièvement en vert.
 
-Pour se déplacer vous pouvez cliquer sur le flèches ou directement utiliser les touches de votre clavier et appuyer sur entrée
+Pour se déplacer vous pouvez cliquer sur le flèches ou directement utiliser les flèches de votre clavier et appuyer sur entrée
 pour validé le déplacment.
 
+
+Les cases grises signifient que vous n'avez pas encore découvert la case.
+Les cases blanches signifient que c'est un passage libre.
+Les cases noires signifient que c'est un mur.
 Les cases avec un petit carré noir au centre sont des pièges qui vous feront perdre 20 points à chaque passage dessus.
 
 --------------------
@@ -90,11 +94,11 @@ les parties, les joueurs et les fantomes. On retrouve aussi tout les include nec
 
 Les fichiers .c sont donc le code à proprement parler du server. 
 
-    -server.c : Le fichier server.c est le fichier principal qui lance l'éxecution du programme. On y retrouve aussi le parseur des messages en TCP.
+    -server.c : Le fichier server.c est le fichier principal qui lance l'éxecution du programme. On y retrouve le main, le thread des joueurs (contenant le parseur des messages TCP), le thread des fantomes pour les fantomes.
 
-    -comm.c : dans ce fichier on va retrouver toutes les fonctions d'envoie de messages aussi bien en TCP qu'en UDP
+    -comm.c : dans ce fichier on va retrouver toutes les fonctions d'envoie de messages aussi bien en TCP qu'en UDP, et les fonctions gérant les parties
 
-    -game.c : On retrouve ici les fonctions afin d'ajouter et de supprimer des joueurs à une partie
+    -game.c : On retrouve ici les fonctions afin d'ajouter et de supprimer des joueurs à une partie, créer et supprimer des parties
 
     -ghost.c : petit fichier avec 3 fonctions permettant la gestion des fantômes
 
@@ -117,11 +121,11 @@ On peut séparer le code java en 2 parties :
 
 -Partie réseau:
 
-    -ClientMulti.java : fichier java qui va gérer l'envoie et la réception de tout les messages multidiffusé
+    -ClientMulti.java : fichier java qui va gérer l'envoie et la réception de tout les messages multidiffusés
     
     -ClientTCP.java : On retrouve les fonctions pour recevoir et envoyer les messages en TCP 
     
-    -ClientUDp.java : On retourve ici les fonctions pour la reception et l'envoie de tout les messages UDP
+    -ClientUDP.java : On retrouve ici les fonctions pour la reception et l'envoie de tous les messages UDP
 
 
 

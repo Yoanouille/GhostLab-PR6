@@ -58,19 +58,6 @@ void remove_player_game(game *g, int sock) {
     g->num_player--;
 }
 
-// game_list *add_game(game_list *l, game *g) {
-//     if(l == NULL) {
-//         game_list *n = malloc(sizeof(game_list));
-//         if(n == NULL) {
-//             perror("malloc add_game");
-//             exit(EXIT_FAILURE);
-//         }
-//         n->g = g;
-//         return n;
-//     }
-//     l->next = add_game(l->next, g);
-//     return l;
-// }
 
 game_list *add_game(game_list *l, game *g) {
     if(l == NULL || l->g->id > g->id) 
@@ -121,11 +108,6 @@ game *get_game(game_list *l, int id) {
     return get_game(l->next, id);
 }
 
-// game *get_player_game(game_list *l,player *p){
-//     if(l==NULL) return NULL;
-//     if(get_player_from_sock(l->g->players,p->sock) != NULL) return l->g;
-//     return get_player_game(l->next,p);
-// }
 
 int size_list_game(game_list *l) {
     if(l == NULL) return 0;

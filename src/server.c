@@ -5,9 +5,7 @@ game_list* g_list = NULL;
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 
-//Function used on one message
-
-
+//Thread des ghosts
 void *ghost_thread(void *arg) {
     game *g = (game *)arg;
     printf("Début thread fantome\n");
@@ -32,6 +30,7 @@ void *ghost_thread(void *arg) {
     return NULL;
 }
 
+//Traite la requête TCP
 int traitement (player *p,char* mess,int* running, int len){
     printf("%s\n", mess);
     if(strncmp(mess,"NEWPL",5) == 0){
@@ -130,34 +129,34 @@ int traitement (player *p,char* mess,int* running, int len){
         return r;
     }
     else {
-        char message [] = "GOBYE***";
-        int r = mySend(p->sock,message,8);
-        return r;
+        if(p->his_game->finished) {
+            char message[] = "GOBYE***";
+            int r = mySend(p->sock,message,8);
+            return r;
+        }
+        else {
+            char message[] = "DUNNO***";
+            int r = mySend(p->sock,message,8);
+            return r;
+        }
     }
     return EXIT_FAILURE;
 }
 
 
-/* Here the TCP connection is established
-You treat the communication protocol between server and ONE client
-*/
+//Thread de communication d'un client, contient le parseur des messages TCP découpés par ***
 void *communication(void *arg){
     srand(time(NULL));
     player *p = (player *) (arg);
-    //First message send is the number of games
-    char message[10];
-    memcpy(message,"GAMES n***",10);
-    
+
     pthread_mutex_lock(&lock);
    
     send_game(p->sock, g_list);
     pthread_mutex_unlock(&lock);
-    
-    //Buffer where we receive data
+
     char buff[SIZE + 1];
     memset(buff, 0, SIZE + 1);
 
-    //Futur full message
     char mess[200];
     memset(mess, 0, 200);
     int x = 0;

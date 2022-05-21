@@ -175,16 +175,3 @@ void gen_piege(lab *l, int nb_piege) {
         l->tab[i][j] = 2;
     }
 }
-
-// int main(void) {
-//     srand(time(NULL));
-//     lab *l = build_lab(15,10);
-    
-//     for(int i = 0; i < 10; i++) {
-//         gen_lab(l);
-//         print_lab_2(l);  
-//         printf("\n");  
-//     }
-    
-//     destroy_lab(l);
-// }
